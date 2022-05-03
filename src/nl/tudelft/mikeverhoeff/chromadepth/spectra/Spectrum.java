@@ -1,6 +1,10 @@
 package nl.tudelft.mikeverhoeff.chromadepth.spectra;
 
+import nl.tudelft.mikeverhoeff.chromadepth.util.Pair;
+
 import java.util.Arrays;
+
+import static nl.tudelft.mikeverhoeff.chromadepth.spectra.ColorMatchingFunctions.*;
 
 public class Spectrum {
 
@@ -13,21 +17,33 @@ public class Spectrum {
     private int argb = 0;
 
     private float[] refXYZ;
+    private String illuminant;
 
     public Spectrum(int start, int stop, int step, float[] samples) {
-        this.start = start;
-        this.stop = stop;
-        this.step = step;
-        this.samples = samples;
-        argb = toRGB();
+        init(start, stop, step, samples);
+    }
+
+    public Spectrum(int start, int stop, int step, float[] samples, String illuminant) {
+        this.illuminant = illuminant;
+        init(start, stop, step, samples);
     }
 
     public Spectrum(int start, int stop, int step, float[] samples, float Xref, float Yref, float Zref) {
+        setRefXYZ(Xref, Yref, Zref);
+        init(start, stop, step, samples);
+    }
+
+    public Spectrum(int start, int stop, int step, float[] samples, float Xref, float Yref, float Zref, String illuminant) {
+        this.illuminant = illuminant;
+        setRefXYZ(Xref, Yref, Zref);
+        init(start, stop, step, samples);
+    }
+
+    private void init(int start, int stop, int step, float[] samples) {
         this.start = start;
         this.stop = stop;
         this.step = step;
         this.samples = samples;
-        setRefXYZ(Xref, Yref, Zref);
         argb = toRGB();
     }
 
@@ -61,21 +77,37 @@ public class Spectrum {
     }
 
     private int toRGB() {
+
         // calculate XYZ
         float X=0;
         float Y=0;
         float Z=0;
-        for(int j=0; j<samples.length; j++) {
-            float sample = samples[j];
-            int sampleWavelength = start+j*step;
-            /*for(int i=0; i<step; i++) { // could improve interpolation
-                X += ColorMatchingFunctions.X(sampleWavelength+i-step/2)*sample;
-                Y += ColorMatchingFunctions.Y(sampleWavelength+i-step/2)*sample;
-                Z += ColorMatchingFunctions.Z(sampleWavelength+i-step/2)*sample;
-            }*/
-            X += ColorMatchingFunctions.X(sampleWavelength)*sample*step;
-            Y += ColorMatchingFunctions.Y(sampleWavelength)*sample*step;
-            Z += ColorMatchingFunctions.Z(sampleWavelength)*sample*step;
+
+        if (illuminant != null) {
+            // calculate white point : my samples were reflective measured under D50
+            Pair<Double, Double> xyD = colorTempToxyColor(5000);
+            double xd = xyD.getA();
+            double yd = xyD.getB();
+            double M = M(xd, yd);
+            double M1 = M1(xd, yd, M);
+            double M2 = M2(xd, yd, M);
+
+            for (int j = 0; j < samples.length; j++) {
+                float sample = samples[j];
+                int sampleWavelength = start + j * step;
+                float sd = (float) Sd(sampleWavelength, M1, M2);
+                X += X(sampleWavelength) * sd * sample * step;
+                Y += Y(sampleWavelength) * sd * sample * step;
+                Z += Z(sampleWavelength) * sd * sample * step;
+            }
+        } else {
+            for (int j = 0; j < samples.length; j++) {
+                float sample = samples[j];
+                int sampleWavelength = start + j * step;
+                X += X(sampleWavelength) * sample * step;
+                Y += Y(sampleWavelength) * sample * step;
+                Z += Z(sampleWavelength) * sample * step;
+            }
         }
         float mag = 1;//(float)Math.sqrt(X*X+Y*Y+Z*Z);
         if(refXYZ != null) {
@@ -92,9 +124,10 @@ public class Spectrum {
             }
         }
 
-        //System.out.println("XYZ (cal): "+X+", "+Y+", "+Z);
-        //if(refXYZ != null && refXYZ.length>=3)
-        //    System.out.println("XYZ (ref): "+refXYZ[0]+", "+refXYZ[1]+", "+refXYZ[2]);
+        System.out.println("XYZ (cal): "+X+", "+Y+", "+Z);
+        if(refXYZ != null && refXYZ.length>=3)
+            System.out.println("XYZ (ref): "+refXYZ[0]+", "+refXYZ[1]+", "+refXYZ[2]);
+            System.out.println("XYZ (delta): "+(X-refXYZ[0])+", "+(Y-refXYZ[1])+", "+(Z-refXYZ[2]));
 
         // D65 conversion
         float r = +3.2406f*X -1.5372f*Y -0.4986f*Z;

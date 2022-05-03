@@ -51,6 +51,8 @@ public class SpectrumIO {
         Pattern p = Pattern.compile("SPECTRAL_NM([0-9]+)");
         int xi=-1, yi=-1, zi=-1;
 
+        String iluminant = (String)context.get("ILLUMINATION_NAME");
+
         int minwave = Integer.MAX_VALUE;
         int maxwave = 0;
         int samplecount = 0;
@@ -90,9 +92,9 @@ public class SpectrumIO {
             }
             Spectrum spectrum;
             if(xi!=-1 && yi!=-1 && zi!=-1) {
-                spectrum = new Spectrum(minwave, maxwave, stepsize, samples, Float.parseFloat(set[xi]), Float.parseFloat(set[yi]), Float.parseFloat(set[zi]));
+                spectrum = new Spectrum(minwave, maxwave, stepsize, samples, Float.parseFloat(set[xi]), Float.parseFloat(set[yi]), Float.parseFloat(set[zi]), iluminant);
             } else {
-                spectrum = new Spectrum(minwave, maxwave, stepsize, samples);
+                spectrum = new Spectrum(minwave, maxwave, stepsize, samples, iluminant);
             }
             spectra.add(spectrum);
         }
