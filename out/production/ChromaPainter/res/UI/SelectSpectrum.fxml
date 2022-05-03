@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<SplitPane dividerPositions="0.5836120401337793" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/18" fx:controller="nl.tudelft.mikeverhoeff.chromadepth.ui.controller.SelectSpectrumController">
+  <items>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+         <children>
+            <Button defaultButton="true" layoutX="109.0" layoutY="359.0" mnemonicParsing="false" onAction="#useColorAction" text="Use color" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+            <Button cancelButton="true" layoutX="36.0" layoutY="359.0" mnemonicParsing="false" onAction="#cancleAction" text="Cancle" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="87.0" />
+            <StackPane fx:id="chartField" layoutX="-25.0" layoutY="124.0" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0" />
+            <Pane fx:id="colorPane" layoutX="73.0" layoutY="-42.0" prefHeight="100.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+         </children></AnchorPane>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+         <children>
+            <TextField fx:id="directoryField" layoutX="14.0" layoutY="14.0" onAction="#onDirectoryChange" prefHeight="25.0" prefWidth="319.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="80.0" AnchorPane.topAnchor="14.0" />
+            <Button layoutX="351.0" layoutY="14.0" mnemonicParsing="false" onAction="#brouseAction" text="Brouse" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" layoutX="76.0" layoutY="112.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="53.0">
+               <content>
+                  <VBox fx:id="filesField" prefHeight="200.0" prefWidth="200.0" />
+               </content>
+            </ScrollPane>
+         </children></AnchorPane>
+  </items>
+</SplitPane>
