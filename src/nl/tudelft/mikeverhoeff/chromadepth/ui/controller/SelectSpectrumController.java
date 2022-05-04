@@ -3,8 +3,11 @@ package nl.tudelft.mikeverhoeff.chromadepth.ui.controller;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -13,7 +16,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.SpectrogramChart;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.SpectrumIO;
@@ -32,6 +37,7 @@ public class SelectSpectrumController implements Initializable {
     private static Map<File, Spectrum> loadedSpectrum;
     static {
         loadedSpectrum = new HashMap<>();
+        lastDirectory = new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra");
     }
     private static File lastDirectory;
 
@@ -188,5 +194,25 @@ public class SelectSpectrumController implements Initializable {
 
     public void setOnAccept(Consumer<Spectrum> onAccept) {
         this.onAccept = onAccept;
+    }
+
+    public static void display(Window window, Consumer<Spectrum> resultHandler) {
+        try {
+            FXMLLoader loader = new FXMLLoader(SelectSpectrumController.class.getResource("/res/UI/SelectSpectrum.fxml"));
+            Parent root = loader.load();
+
+            Stage dialog = new Stage();
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            dialog.initOwner(window);
+            SelectSpectrumController ssc = (SelectSpectrumController)loader.getController();
+            ssc.setOnAccept(resultHandler);
+
+            Scene dialogScene = new Scene(root, 500, 400);
+            dialog.setScene(dialogScene);
+            dialog.setOnCloseRequest(event -> ssc.onClose());
+            dialog.show();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
     }
 }

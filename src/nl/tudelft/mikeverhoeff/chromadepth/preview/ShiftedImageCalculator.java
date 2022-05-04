@@ -61,7 +61,8 @@ public class ShiftedImageCalculator {
         // calculate the screen color for the spectra
         for (int x = 0; x < painting.getWidth()+samplecount; x++) {
             for (int y = 0; y < painting.getHeight(); y++) {
-                int color = new Spectrum(start, end, step, shiftedImage[x][y]).getArgb();
+                //int color = new Spectrum(start, end, step, shiftedImage[x][y]).getArgb();
+                int color = new Spectrum(start, end, step, shiftedImage[x][y], "D50").getArgb();
                 writer.setArgb(x, y, color);
             }
         }

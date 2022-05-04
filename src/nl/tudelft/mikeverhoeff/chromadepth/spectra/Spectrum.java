@@ -39,6 +39,13 @@ public class Spectrum {
         init(start, stop, step, samples);
     }
 
+    public Spectrum(Spectrum metareference, float[] samples) {
+        this.start = metareference.getStart();
+        this.stop = metareference.getStop();
+        this.step = metareference.getStep();
+        this.illuminant = metareference.getIlluminant();
+    }
+
     private void init(int start, int stop, int step, float[] samples) {
         this.start = start;
         this.stop = stop;
@@ -61,6 +68,14 @@ public class Spectrum {
 
     public float[] getSamples() {
         return samples;
+    }
+
+    public float getMaxSampleValue() {
+        float max = 0;
+        for(float value:samples) {
+            max = Math.max(max, value);
+        }
+        return max;
     }
 
     public int getArgb() {
@@ -124,10 +139,11 @@ public class Spectrum {
             }
         }
 
-        System.out.println("XYZ (cal): "+X+", "+Y+", "+Z);
-        if(refXYZ != null && refXYZ.length>=3)
-            System.out.println("XYZ (ref): "+refXYZ[0]+", "+refXYZ[1]+", "+refXYZ[2]);
-            System.out.println("XYZ (delta): "+(X-refXYZ[0])+", "+(Y-refXYZ[1])+", "+(Z-refXYZ[2]));
+        if(refXYZ != null && refXYZ.length>=3) {
+            System.out.println("XYZ (cal): "+X+", "+Y+", "+Z);
+            System.out.println("XYZ (ref): " + refXYZ[0] + ", " + refXYZ[1] + ", " + refXYZ[2]);
+            System.out.println("XYZ (delta): " + (X - refXYZ[0]) + ", " + (Y - refXYZ[1]) + ", " + (Z - refXYZ[2]));
+        }
 
         // D65 conversion
         float r = +3.2406f*X -1.5372f*Y -0.4986f*Z;
@@ -156,5 +172,9 @@ public class Spectrum {
         } else {
             return (float) Math.min(1.0,1.055 * Math.pow(c, 1/2.4) - 0.055);
         }
+    }
+
+    public String getIlluminant() {
+        return illuminant;
     }
 }

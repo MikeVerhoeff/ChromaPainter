@@ -7,9 +7,15 @@ import javafx.scene.paint.Paint;
 
 public class SpectrogramChart extends Canvas {
 
+    float maxValue = -1;
+
     public SpectrogramChart() {
         super(200, 200);
         System.out.println("chart test");
+    }
+
+    public void setMaxValue(float value) {
+        maxValue = value;
     }
 
     public void displayColorSpectrum(Spectrum spectrum) {
@@ -17,9 +23,13 @@ public class SpectrogramChart extends Canvas {
         double height = this.getHeight();
 
         float maxIntensity = 0;
-        for (int i = 0; i < spectrum.getSamples().length; i++) {
-            if (spectrum.getSamples()[i] > maxIntensity) {
-                maxIntensity = spectrum.getSamples()[i];
+        if(maxValue>0) {
+            maxIntensity = maxValue;
+        } else {
+            for (int i = 0; i < spectrum.getSamples().length; i++) {
+                if (spectrum.getSamples()[i] > maxIntensity) {
+                    maxIntensity = spectrum.getSamples()[i];
+                }
             }
         }
 

@@ -11,6 +11,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("/res/UI/MainWindow.fxml"));
+        //Parent root = FXMLLoader.load(getClass().getResource("/res/UI/ColorSpaceTest.fxml"));
         primaryStage.setTitle("Chroma Depth Painting");
         primaryStage.setScene(new Scene(root, 1000, 600));
         primaryStage.show();

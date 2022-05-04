@@ -62,8 +62,8 @@ public class Paint {
 
     public void displayEditDialog(MainController mainController) {
 
-
-        try {
+        SelectSpectrumController.display(mainController.getWindow(), (Spectrum spectrum) -> {this.spectrum = spectrum; mainController.updateColorChange();});
+        /*try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/res/UI/SelectSpectrum.fxml"));
             Parent root = loader.load();
 
@@ -79,7 +79,7 @@ public class Paint {
             dialog.show();
         } catch (IOException exception) {
             exception.printStackTrace();
-        }
+        }*/
 
         /*FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(mainController.getWindow());

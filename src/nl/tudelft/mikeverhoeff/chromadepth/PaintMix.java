@@ -92,6 +92,6 @@ public class PaintMix {
                 mixresults[j] += paints.get(i).getSpectrum().getSamples()[j] * Byte.toUnsignedInt(values[i]) / 255;
             }
         }
-        return new Spectrum(samplestart, samplestop, samplestep, mixresults);
+        return new Spectrum(samplestart, samplestop, samplestep, mixresults, paints.get(0).getSpectrum().getIlluminant());
     }
 }
