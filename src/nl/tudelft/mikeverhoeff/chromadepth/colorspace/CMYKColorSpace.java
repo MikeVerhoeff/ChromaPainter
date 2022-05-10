@@ -78,20 +78,44 @@ public class CMYKColorSpace extends ColorSpace {
         interp[3] = Byte.toUnsignedInt(values[3])/255.0f;
 
         for (int i=0; i<resultSamples.length; i++) {
+
+            // implementation: kubelka-munk
+            float scale = 10000;
+
+            float r_p = backgroundColor.getSamples()[i] * scale;
+            float r_c = cyan.getSamples()[i] * scale;
+            float r_m = magenta.getSamples()[i] * scale;
+            float r_y = yellow.getSamples()[i] * scale;
+            float r_k = key.getSamples()[i] * scale;
+
+            float ks_p = (1-r_p)*(1-r_p)/(2*r_p);
+            float ks_c = (1-r_c)*(1-r_c)/(2*r_c) - ks_p;
+            float ks_m = (1-r_m)*(1-r_m)/(2*r_m) - ks_p;
+            float ks_y = (1-r_y)*(1-r_y)/(2*r_y) - ks_p;
+            float ks_k = (1-r_k)*(1-r_k)/(2*r_k) - ks_p;
+
+            float ks_mix = ks_p + (interp[0]*ks_c + interp[1]*ks_m + interp[2]*ks_y + interp[3]*ks_k);
+
+            float r_mix = (1 + ks_mix - (float)Math.sqrt(ks_mix*ks_mix + 2*ks_mix)) / scale;
+
+            resultSamples[i] = r_mix;
+
+            // implementation: minimun (decent color, bad spectrum)
             float c = (1-interp[0]) * backgroundColor.getSamples()[i] + (interp[0]) * cyan.getSamples()[i];
             float m = (1-interp[1]) * backgroundColor.getSamples()[i] + (interp[1]) * magenta.getSamples()[i];
             float y = (1-interp[2]) * backgroundColor.getSamples()[i] + (interp[2]) * yellow.getSamples()[i];
             float k = (1-interp[3]) * backgroundColor.getSamples()[i] + (interp[3]) * key.getSamples()[i];
 
-            resultSamples[i] = Math.min(c, Math.min(m, Math.min(y, k)));
+            //resultSamples[i] = Math.min(c, Math.min(m, Math.min(y, k)));
 
+            // implementation: scale (bad color, decent spectrum)
             float background = backgroundColor.getSamples()[i];
             c = cyan.getSamples()[i]/background * interp[0] + (1-interp[0]);
             m = magenta.getSamples()[i]/background * interp[1] + (1-interp[1]);
             y = yellow.getSamples()[i]/background * interp[2] + (1-interp[2]);
             k = key.getSamples()[i]/background * interp[3] + (1-interp[3]);
 
-            resultSamples[i] = background * c * m * y * k;
+            //resultSamples[i] = background * c * m * y * k;
         }
 
         return new Spectrum(

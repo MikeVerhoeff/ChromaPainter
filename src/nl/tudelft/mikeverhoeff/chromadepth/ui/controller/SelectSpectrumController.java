@@ -56,6 +56,9 @@ public class SelectSpectrumController implements Initializable {
     @FXML
     private VBox filesField;
 
+    @FXML
+    private Label colorInfo;
+
     private Consumer<Spectrum> onAccept;
     private File directory;
     private Spectrum selectedSpectrum;
@@ -154,6 +157,7 @@ public class SelectSpectrumController implements Initializable {
             int screencolor = spectrum.getArgb();
             colorPane.setStyle("-fx-background-color: rgb("+((screencolor>>16) & 0xff)+","+((screencolor>>8) & 0xff)+","+((screencolor) & 0xff)+")");
             filePane.setStyle("-fx-background-color: rgb("+((screencolor>>16) & 0xff)+","+((screencolor>>8) & 0xff)+","+((screencolor) & 0xff)+")");
+            colorInfo.setText("RGB: "+((screencolor>>16) & 0xff)+","+((screencolor>>8) & 0xff)+","+((screencolor) & 0xff));
             this.selectedSpectrum = spectrum;
             loadedSpectrum.put(file, spectrum);
             event.consume();

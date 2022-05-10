@@ -108,4 +108,36 @@ public class PaintingIO {
         }
     }
 
+    public static Painting loadImage(File file) {
+
+        try {
+            BufferedImage image = ImageIO.read(file);
+            int width = image.getWidth();
+            int height = image.getHeight();
+            int chanels = image.getColorModel().getNumComponents();
+            List<Paint> paints = new ArrayList<>(chanels);
+            if(chanels == 3) {
+                paints.add(new Paint(Paint.RGBColor.RED));
+                paints.add(new Paint(Paint.RGBColor.GREEN));
+                paints.add(new Paint(Paint.RGBColor.BLUE));
+            } else {
+                for (int i = 0; i < chanels; i++) {
+                    paints.add(Paint.getDefault());
+                }
+            }
+            Painting painting = new Painting(width, height, paints);
+
+            for(int x=0; x<width; x++) {
+                for(int y=0; y<height; y++) {
+                    int color = image.getRGB(x, y);
+                    painting.setPixel(x, y, new byte[]{(byte)((color>>16)&0xff), (byte)((color>>8)&0xff), (byte)((color)&0xff)});
+                }
+            }
+
+            return painting;
+        } catch (IOException exception) {
+            exception.printStackTrace();
+            return null;
+        }
+    }
 }

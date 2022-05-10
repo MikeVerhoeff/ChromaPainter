@@ -42,6 +42,7 @@
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
@@ -57,6 +58,7 @@
           <items>
             <MenuItem mnemonicParsing="false" onAction="#NewAction" text="New" />
             <MenuItem mnemonicParsing="false" onAction="#openAction" text="Open…" />
+                  <MenuItem fx:id="importAction" mnemonicParsing="false" onAction="#importAction" text="Import" />
             <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" text="Close" />
             <MenuItem mnemonicParsing="false" text="Save" />
@@ -118,9 +120,14 @@
             </AnchorPane>
           </content>
         </ScrollPane>
-        <AnchorPane fx:id="PreviewSpace">
+        <AnchorPane>
           <children>
             <Label alignment="CENTER" font="$x1" layoutX="14.0" layoutY="14.0" style="&#10;" text="Preview" textAlignment="CENTER" textFill="$x2" wrapText="false" />
+                  <ScrollPane fitToWidth="true" layoutX="11.0" layoutY="105.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0">
+                     <content>
+                        <FlowPane fx:id="PreviewSpace" prefHeight="200.0" prefWidth="200.0" />
+                     </content>
+                  </ScrollPane>
           </children>
         </AnchorPane>
       </items>

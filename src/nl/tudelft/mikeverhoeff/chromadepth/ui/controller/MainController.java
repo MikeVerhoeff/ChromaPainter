@@ -4,13 +4,16 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -44,7 +47,7 @@ public class MainController implements Initializable {
     private ToolSelector toolSelector;
 
     @FXML
-    private AnchorPane PreviewSpace;
+    private FlowPane PreviewSpace;
     private EyeShiftUI singleEyePreview;
 
     @FXML
@@ -131,6 +134,19 @@ public class MainController implements Initializable {
     }
 
     @FXML
+    public void importAction(ActionEvent event) {
+        System.out.println("Importing");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Importing Image");
+        File file = fileChooser.showOpenDialog(menuBar.getScene().getWindow());
+        Painting importedPainting = PaintingIO.loadImage(file);
+        if(importedPainting != null) {
+            displayPainting(importedPainting);
+            updateColorChange();
+        }
+    }
+
+    @FXML
     public void initialize(URL location, ResourceBundle resources) {
         canvas = new Canvas();
         CanvasSpace.getChildren().add(canvas);
@@ -155,6 +171,7 @@ public class MainController implements Initializable {
         AnchorPane.setLeftAnchor(singleEyePreview, 0.0);
         AnchorPane.setRightAnchor(singleEyePreview, 0.0);
         AnchorPane.setBottomAnchor(singleEyePreview, 0.0);
+        PreviewSpace.setAlignment(Pos.TOP_CENTER);
         PreviewSpace.getChildren().add(singleEyePreview);
     }
 

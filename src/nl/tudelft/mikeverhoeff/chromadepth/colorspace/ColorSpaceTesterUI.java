@@ -66,12 +66,16 @@ public class ColorSpaceTesterUI implements Initializable {
         SelectSpectrumController.display(primariesBox.getScene().getWindow(), (spectrum -> {
             setPaneColor(referenceColorSpace, spectrum.getArgb());
             referenceSpectrum.displayColorSpectrum(spectrum);
+            spectrumReference = spectrum;
         }));
     }
     private SpectrogramChart resultSpectrum;
     private SpectrogramChart referenceSpectrum;
+    private float X=0, Y=0, Z=0;
+    private Spectrum spectrumReference;
 
     private CMYKColorSpace colorSpace;
+    private MyPrinterSimulator printerSpace;
 
     private void setPaneColor(Pane pane, int screencolor) {
         pane.setStyle("-fx-background-color: rgb("+((screencolor>>16) & 0xff)+","+((screencolor>>8) & 0xff)+","+((screencolor) & 0xff)+")");
@@ -85,7 +89,9 @@ public class ColorSpaceTesterUI implements Initializable {
         referenceSpectrum = new SpectrogramChart();
         referenceSpectrumSpace.getChildren().add(referenceSpectrum);
 
-        colorSpace = new CMYKColorSpace();
+        //colorSpace = new CMYKColorSpace();
+        printerSpace = new MyPrinterSimulator();
+        colorSpace = printerSpace.getPrinterSpace();
         try {
             colorSpace.setBackgroundColor(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\50_m1.txt")).get(0));
             colorSpace.setCyan(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\06_m1.txt")).get(0));
@@ -171,9 +177,24 @@ public class ColorSpaceTesterUI implements Initializable {
         spinnerY.getValueFactory().setValue(sliderY.getValue());
         spinnerK.getValueFactory().setValue(sliderK.getValue());
 
-        Spectrum result = colorSpace.getSpectrumForValues(values);
+        //Spectrum result = colorSpace.getSpectrumForValues(values);
+        Spectrum result = printerSpace.getSpectrumForValues(values);
 
         resultSpectrum.displayColorSpectrum(result);
         setPaneColor(resultcolorSpace, result.getArgb());
+
+        if(spectrumReference != null) {
+            float[] resXYZ = result.getXYZ();
+            int refRGB = spectrumReference.getArgb();
+            int refR = (refRGB>>16) & 0xff;
+            int refG = (refRGB>>8 ) & 0xff;
+            int refB = (refRGB    ) & 0xff;
+            int resRGB = result.getArgb();
+            int resR = (resRGB>>16) & 0xff;
+            int resG = (resRGB>>8 ) & 0xff;
+            int resB = (resRGB    ) & 0xff;
+            System.out.println("Delta XYZ: " + (X - resXYZ[0]) + ", " + (Y - resXYZ[1]) + ", " + (Z - resXYZ[2]));
+            System.out.println("Delta RGB: " + (refR-resR) + ", " + (refG-resG) + ", " + (refB-resB));
+        }
     }
 }

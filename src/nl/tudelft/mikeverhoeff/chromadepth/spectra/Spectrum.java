@@ -17,6 +17,7 @@ public class Spectrum {
     private int argb = 0;
 
     private float[] refXYZ;
+    private float[] XYZ;
     private String illuminant;
 
     public Spectrum(int start, int stop, int step, float[] samples) {
@@ -44,6 +45,7 @@ public class Spectrum {
         this.stop = metareference.getStop();
         this.step = metareference.getStep();
         this.illuminant = metareference.getIlluminant();
+        init(start, stop, step, samples);
     }
 
     private void init(int start, int stop, int step, float[] samples) {
@@ -128,9 +130,11 @@ public class Spectrum {
         if(refXYZ != null) {
             mag = Y/refXYZ[1];
         }
+        //System.out.println(mag);
         X=X/mag;
         Y=Y/mag;
         Z=Z/mag;
+        XYZ = new float[] {X, Y, Z};
 
         // update samles to reflect correct magnetude
         if(mag != 1) {
@@ -176,5 +180,9 @@ public class Spectrum {
 
     public String getIlluminant() {
         return illuminant;
+    }
+
+    public float[] getXYZ() {
+        return XYZ;
     }
 }

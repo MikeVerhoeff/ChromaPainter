@@ -39,6 +39,10 @@ public class Painting {
         setPixelUnchecked(x, y, color);
     }
 
+    public void setPixel(int x, int y, byte[] color) {
+        setPixel(x, y, new PaintMix(paints, color));
+    }
+
     public void setSquare(int x, int y, int w, int h, PaintMix color) {
         if(color.getPaints().size() != paints.size())
             throw new RuntimeException("Color dimention mismatch");
