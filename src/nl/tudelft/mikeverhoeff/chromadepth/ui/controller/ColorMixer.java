@@ -6,16 +6,21 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import nl.tudelft.mikeverhoeff.chromadepth.PaintMix;
+import nl.tudelft.mikeverhoeff.chromadepth.colorspace.ColorSpace;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.SpectrogramChart;
+import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
 
 public class ColorMixer extends AnchorPane {
 
 
-    private PaintMix paintMix;
+    //private PaintMix paintMix;
     private VBox paintSlides;
     private Pane mixColor;
     private SpectrogramChart spectrogramChart;
     private MainController mainController;
+
+    private ColorSpace colorSpace;
+    private byte[] values;
 
     public ColorMixer() {
         mixColor = new Pane();
@@ -42,14 +47,18 @@ public class ColorMixer extends AnchorPane {
         this.mainController = mainController;
     }
 
-    public void setPaintMix(PaintMix paintMix) {
-        this.paintMix = paintMix;
+    public void setColorSpace(ColorSpace colorSpace) {
+        this.colorSpace = colorSpace;
+    }
+
+    public void setPaintMix(byte[] values) {
+        this.values = values;
         paintSlides.getChildren().clear();
-        for(int i=0; i<paintMix.getPaints().size(); i++) {
-            PaintSlider slider = new PaintSlider(paintMix.getPaints().get(i),paintMix.getValues()[i]);
+        for(int i=0; i<values.length; i++) {
+            PaintSlider slider = new PaintSlider(colorSpace.getChanelColor(i),values[i]);
             int finalI = i;
             slider.setChangeHandler(value -> {
-                paintMix.getValues()[finalI]=value;
+                values[finalI]=value;
                 updateMixColor();
             });
             slider.setMainController(mainController);
@@ -59,13 +68,15 @@ public class ColorMixer extends AnchorPane {
     }
 
     private void updateMixColor() {
-        int screencolor = paintMix.getScreenColor();
+        Spectrum spectrum = colorSpace.getSpectrumForValues(values);
+        //int screencolor = colorSpace.getScreenColorForValues(values);
+        int screencolor = spectrum.getArgb();
         mixColor.setStyle("-fx-background-color: rgb("+((screencolor>>16) & 0xff)+","+((screencolor>>8) & 0xff)+","+((screencolor) & 0xff)+")");
-        spectrogramChart.displayColorSpectrum(paintMix.getSpectrum());
+        spectrogramChart.displayColorSpectrum(spectrum);
     }
 
-    public PaintMix getPaintMix() {
-        return paintMix;
+    public byte[] getPaintMix() {
+        return values;
     }
 
     public void updateColorChange() {

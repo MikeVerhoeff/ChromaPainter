@@ -24,6 +24,7 @@ import nl.tudelft.mikeverhoeff.chromadepth.Paint;
 import nl.tudelft.mikeverhoeff.chromadepth.PaintMix;
 import nl.tudelft.mikeverhoeff.chromadepth.Painting;
 import nl.tudelft.mikeverhoeff.chromadepth.PaintingIO;
+import nl.tudelft.mikeverhoeff.chromadepth.colorspace.MyPrinterSimulator;
 import nl.tudelft.mikeverhoeff.chromadepth.painttools.PaintTool;
 import nl.tudelft.mikeverhoeff.chromadepth.preview.EyeShiftUI;
 
@@ -63,14 +64,14 @@ public class MainController implements Initializable {
         paints.add(new Paint(Paint.RGBColor.GREEN));
         paints.add(new Paint(Paint.RGBColor.BLUE));
 
-        PaintMix red    = new PaintMix(paints, (byte)255, (byte)0, (byte)0);
-        PaintMix yellow = new PaintMix(paints, (byte)255, (byte)255, (byte)0);
-        PaintMix green  = new PaintMix(paints, (byte)0, (byte)255, (byte)0);
-        PaintMix cyan   = new PaintMix(paints, (byte)0, (byte)255, (byte)255);
-        PaintMix blue   = new PaintMix(paints, (byte)0, (byte)0, (byte)255);
-        PaintMix magenta= new PaintMix(paints, (byte)255, (byte)0, (byte)255);
+        byte[] red    = new byte[] {(byte)255, (byte)0,   (byte)0};
+        byte[] yellow = new byte[] {(byte)255, (byte)255, (byte)0};
+        byte[] green  = new byte[] {(byte)0,   (byte)255, (byte)0};
+        byte[] cyan   = new byte[] {(byte)0,   (byte)255, (byte)255};
+        byte[] blue   = new byte[] {(byte)0,   (byte)0,   (byte)255};
+        byte[] magenta= new byte[] {(byte)255, (byte)0,   (byte)255};
 
-        Painting painting = new Painting(50, 50, paints);
+        Painting painting = new Painting(150, 150, new MyPrinterSimulator());
 
         painting.setSquare(10,10, 10, 10, red);
         painting.setSquare(10,20, 10, 10, yellow);
@@ -178,10 +179,10 @@ public class MainController implements Initializable {
     public void displayPainting(Painting painting) {
         List<Paint> paints = painting.getPaints();
         byte[] vales = new byte[paints.size()];
-        PaintMix paintMix = new PaintMix(paints, vales);
-        colorMixer.setPaintMix(paintMix);
+        colorMixer.setColorSpace(painting.getColorSpace());
+        colorMixer.setPaintMix(vales);
         canvas.setPainting(painting);
-        toolSelector.handlePaintChange(paintMix);
+        toolSelector.handlePaintChange(vales);
         if(tool != null) {
             canvas.setPaintTool(tool);
         } else {

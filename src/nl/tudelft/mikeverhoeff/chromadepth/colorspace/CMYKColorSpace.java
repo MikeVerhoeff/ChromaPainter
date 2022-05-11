@@ -64,6 +64,21 @@ public class CMYKColorSpace extends ColorSpace {
     }
 
     @Override
+    public Paint getChanelColor(int channel) {
+        if(channel==0) {
+            return new Paint(cyan);
+        } else if (channel==1) {
+            return new Paint(magenta);
+        } else if (channel==2) {
+            return new Paint(yellow);
+        } else if (channel==3) {
+            return new Paint(key);
+        } else {
+            return Paint.getDefault();
+        }
+    }
+
+    @Override
     public int getScreenColorForValues(byte[] values) {
         return getSpectrumForValues(values).getArgb();
     }
@@ -99,6 +114,31 @@ public class CMYKColorSpace extends ColorSpace {
             float r_mix = (1 + ks_mix - (float)Math.sqrt(ks_mix*ks_mix + 2*ks_mix)) / scale;
 
             resultSamples[i] = r_mix;
+
+            // implementation: Yule-Nielson modified Spectral Neugebauer
+
+            float aw = (1-interp[0]) * (1-interp[1]) * (1-interp[2]) * (1-interp[3]); // white
+
+            float ac = ( interp[0] ) * (1-interp[1]) * (1-interp[2]) * (1-interp[2]); // cyan
+            float am = (1-interp[0]) * ( interp[1] ) * (1-interp[2]) * (1-interp[2]); // magenta
+            float ay = (1-interp[0]) * (1-interp[1]) * ( interp[2] ) * (1-interp[2]); // yellow
+            float ak = (1-interp[0]) * (1-interp[1]) * (1-interp[2]) * ( interp[3] ); // black
+
+
+            float amy = (1-interp[0]) * ( interp[1] ) * ( interp[2] ) * (1-interp[2]); // red
+            float acy = ( interp[0] ) * (1-interp[1]) * ( interp[2] ) * (1-interp[2]); // green
+            float acm = ( interp[0] ) * ( interp[1] ) * (1-interp[2]) * (1-interp[2]); // blue
+            float ack = ( interp[0] ) * (1-interp[1]) * (1-interp[2]) * ( interp[3] ); // dark cyan
+            float amk = (1-interp[0]) * ( interp[1] ) * (1-interp[2]) * ( interp[3] ); // dark magenta
+            float ayk = (1-interp[0]) * (1-interp[1]) * ( interp[2] ) * ( interp[3] ); // dark yellow
+
+            float acmy = ( interp[0] ) * ( interp[1] ) * ( interp[2] ) * (1-interp[3]); // mixed black
+            float acmk = ( interp[0] ) * ( interp[1] ) * (1-interp[2]) * ( interp[3] ); // dark blue
+            float acyk = ( interp[0] ) * (1-interp[1]) * ( interp[2] ) * ( interp[3] ); // dark green
+            float amyk = (1-interp[0]) * ( interp[1] ) * ( interp[2] ) * ( interp[3] ); // dark red
+
+            float acmyk = ( interp[0] ) * ( interp[1] ) * ( interp[2] ) * ( interp[3] ); // pure black
+
 
             // implementation: minimun (decent color, bad spectrum)
             float c = (1-interp[0]) * backgroundColor.getSamples()[i] + (interp[0]) * cyan.getSamples()[i];

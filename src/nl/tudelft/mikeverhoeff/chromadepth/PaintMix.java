@@ -9,6 +9,7 @@ import java.util.List;
 
 import static nl.tudelft.mikeverhoeff.chromadepth.Paint.RGBColor.RED;
 
+@Deprecated
 public class PaintMix {
 
     private List<Paint> paints;

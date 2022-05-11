@@ -1,9 +1,12 @@
 package nl.tudelft.mikeverhoeff.chromadepth.colorspace;
 
+import nl.tudelft.mikeverhoeff.chromadepth.Paint;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
+import nl.tudelft.mikeverhoeff.chromadepth.spectra.SpectrumIO;
 
 import java.awt.color.ICC_ColorSpace;
 import java.awt.color.ICC_Profile;
+import java.io.File;
 import java.io.IOException;
 
 public class MyPrinterSimulator extends ColorSpace {
@@ -13,11 +16,20 @@ public class MyPrinterSimulator extends ColorSpace {
 
     public MyPrinterSimulator() {
         printerSpace = new CMYKColorSpace();
-        /*try {
+        try {
             colorConverterCMYK = new ICC_ColorSpace(ICC_Profile.getInstance("C:\\Users\\Mike\\Desktop\\Research Project\\Programming\\ChromaPainter\\src\\res\\SWOP2006_Coated5_GCR_bas.icc"));
         } catch (IOException exception) {
             exception.printStackTrace();
-        }*/
+        }
+        try {
+            printerSpace.setBackgroundColor(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\50_m1.txt")).get(0));
+            printerSpace.setCyan(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\06_m1.txt")).get(0));
+            printerSpace.setYellow(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\01_m1.txt")).get(0));
+            printerSpace.setMagenta(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\05_m1.txt")).get(0));
+            printerSpace.setKey(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\46_m1.txt")).get(0));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -26,8 +38,21 @@ public class MyPrinterSimulator extends ColorSpace {
     }
 
     @Override
+    public Paint getChanelColor(int channel) {
+        if(channel==0) {
+            return new Paint(Paint.RGBColor.RED);
+        } else if (channel==1) {
+            return new Paint(Paint.RGBColor.GREEN);
+        } else if (channel==2) {
+            return new Paint(Paint.RGBColor.BLUE);
+        } else {
+            return Paint.getDefault();
+        }
+    }
+
+    @Override
     public int getScreenColorForValues(byte[] values) {
-        return 0xff<<24 | values[0]&0xff << 16 | values[1]&0xff << 8 | values[2]&0xff;
+        return 0xff<<24 | (values[0]&0xff) << 16 | (values[1]&0xff) << 8 | (values[2]&0xff);
     }
 
     @Override

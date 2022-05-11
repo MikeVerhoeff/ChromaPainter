@@ -1,6 +1,7 @@
 package nl.tudelft.mikeverhoeff.chromadepth;
 
 import javafx.scene.control.Alert;
+import nl.tudelft.mikeverhoeff.chromadepth.colorspace.MyPrinterSimulator;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
@@ -116,7 +117,7 @@ public class PaintingIO {
             int height = image.getHeight();
             int chanels = image.getColorModel().getNumComponents();
             List<Paint> paints = new ArrayList<>(chanels);
-            if(chanels == 3) {
+            if(chanels == 3 || true) {
                 paints.add(new Paint(Paint.RGBColor.RED));
                 paints.add(new Paint(Paint.RGBColor.GREEN));
                 paints.add(new Paint(Paint.RGBColor.BLUE));
@@ -125,7 +126,7 @@ public class PaintingIO {
                     paints.add(Paint.getDefault());
                 }
             }
-            Painting painting = new Painting(width, height, paints);
+            Painting painting = new Painting(width, height, new MyPrinterSimulator());
 
             for(int x=0; x<width; x++) {
                 for(int y=0; y<height; y++) {

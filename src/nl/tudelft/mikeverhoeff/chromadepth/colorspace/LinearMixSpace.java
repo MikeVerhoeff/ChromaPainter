@@ -21,6 +21,11 @@ public class LinearMixSpace extends ColorSpace {
     }
 
     @Override
+    public Paint getChanelColor(int channel) {
+        return paints.get(channel);
+    }
+
+    @Override
     public int getScreenColorForValues(byte[] values) {
         return getSpectrumForValues(values).getArgb();
     }

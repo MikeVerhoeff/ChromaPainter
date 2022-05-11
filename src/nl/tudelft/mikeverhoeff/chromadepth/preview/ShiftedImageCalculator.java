@@ -34,7 +34,8 @@ public class ShiftedImageCalculator {
         List<Paint> paints = painting.getPaints();
         for(int x=0; x<painting.getWidth(); x++) {
             for(int y=0; y< painting.getHeight(); y++) {
-                spectralData[x][y] = painting.getPaintMix(x, y).getSpectrum().getSamples();
+                spectralData[x][y] = painting.getColorSpace().getSpectrumForValues(painting.getPaintMix(x, y).getValues()).getSamples();
+                //spectralData[x][y] = painting.getPaintMix(x, y).getSpectrum().getSamples();
             }
         }
     }

@@ -6,9 +6,9 @@ import nl.tudelft.mikeverhoeff.chromadepth.Painting;
 public class BrushTool extends PaintTool {
 
     private int radius;
-    private PaintMix color;
+    private byte[] color;
 
-    public BrushTool(int radius, PaintMix color) {
+    public BrushTool(int radius, byte[] color) {
         this.radius = radius;
         this.color = color;
     }

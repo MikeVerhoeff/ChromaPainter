@@ -9,7 +9,7 @@ import java.util.List;
 
 public class PaintTool {
 
-    public boolean safePaint(Painting painting, int x, int y, PaintMix color) {
+    public boolean safePaint(Painting painting, int x, int y, byte[] color) {
         if (x>=0 && y>=0 && x<painting.getWidth() && y<painting.getHeight()) {
             painting.setPixel(x, y, color);
             return true;

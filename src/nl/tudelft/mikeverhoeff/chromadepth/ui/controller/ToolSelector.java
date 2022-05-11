@@ -90,7 +90,7 @@ public class ToolSelector extends AnchorPane {
         }
     }
 
-    public void handlePaintChange(PaintMix paintMix) {
+    public void handlePaintChange(byte[] paintMix) {
         this.tool = new BrushTool(spinner.getValue(), paintMix);
     }
 

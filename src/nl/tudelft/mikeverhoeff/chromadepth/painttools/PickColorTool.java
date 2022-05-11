@@ -22,7 +22,6 @@ public class PickColorTool extends PaintTool {
         for(int i=0; i<paints.size(); i++) {
             values[i] = painting.getChannels().get(i).getPixel(x, y);
         }
-        PaintMix paintMix = new PaintMix(paints, values);
-        mainController.getColorMixer().setPaintMix(paintMix);
+        mainController.getColorMixer().setPaintMix(values);
     }
 }
