@@ -1,5 +1,6 @@
 package nl.tudelft.mikeverhoeff.chromadepth.colorspace;
 
+import javafx.stage.Window;
 import nl.tudelft.mikeverhoeff.chromadepth.Paint;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.SpectrumIO;
@@ -8,6 +9,7 @@ import java.awt.color.ICC_ColorSpace;
 import java.awt.color.ICC_Profile;
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Consumer;
 
 public class MyPrinterSimulator extends ColorSpace {
 
@@ -18,7 +20,8 @@ public class MyPrinterSimulator extends ColorSpace {
         printerSpace = new CMYKColorSpace();
         try {
             colorConverterCMYK = new ICC_ColorSpace(ICC_Profile.getInstance("C:\\Users\\Mike\\Desktop\\Research Project\\Programming\\ChromaPainter\\src\\res\\SWOP2006_Coated5_GCR_bas.icc"));
-        } catch (IOException exception) {
+            //colorConverterCMYK = new ICC_ColorSpace(ICC_Profile.getInstance(ICC_Profile.icSigCmykData));
+        } catch (Exception exception) {
             exception.printStackTrace();
         }
         try {
@@ -83,5 +86,10 @@ public class MyPrinterSimulator extends ColorSpace {
 
     public void setPrinterSpace(CMYKColorSpace printerSpace) {
         this.printerSpace = printerSpace;
+    }
+
+    @Override
+    public void configureGUI(Window window, Consumer<ColorSpace> finish) {
+        finish.accept(this);
     }
 }

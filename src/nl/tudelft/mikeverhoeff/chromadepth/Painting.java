@@ -49,6 +49,14 @@ public class Painting {
         initializeImage();
     }
 
+    public boolean doesPreviewRealColors() {
+        return previewRealColors;
+    }
+
+    public void setPreviewRealColors(boolean previewRealColors) {
+        this.previewRealColors = previewRealColors;
+    }
+
     private int getDisplayColor(byte[] values) {
         if(previewRealColors) {
             return colorSpace.getSpectrumForValues(values).getArgb();

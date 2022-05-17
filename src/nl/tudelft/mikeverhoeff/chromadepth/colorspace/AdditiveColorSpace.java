@@ -12,29 +12,40 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import nl.tudelft.mikeverhoeff.chromadepth.Paint;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
+import nl.tudelft.mikeverhoeff.chromadepth.ui.controller.PaintSlider;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class LinearMixSpace extends ColorSpace {
+public class AdditiveColorSpace extends ColorSpace {
 
-    private List<Paint> paints;
+    private List<Paint> lights;
 
-    public LinearMixSpace(List<Paint> paints) {
-        this.paints = paints;
+    public AdditiveColorSpace() {
+
     }
 
+    public AdditiveColorSpace(List<Paint> lights) {
+        this.lights = lights;
+    }
+
+    public List<Paint> getLights() {
+        return lights;
+    }
+
+    public void setLights(List<Paint> lights) {
+        this.lights = lights;
+    }
 
     @Override
     public int getNumberOfChannels() {
-        return paints.size();
+        return lights.size();
     }
 
     @Override
     public Paint getChanelColor(int channel) {
-        return paints.get(channel);
+        return lights.get(channel);
     }
 
     @Override
@@ -44,20 +55,19 @@ public class LinearMixSpace extends ColorSpace {
 
     @Override
     public Spectrum getSpectrumForValues(byte[] values) {
-        int samplesize = paints.get(0).getSpectrum().getSamples().length;
-        int samplestart = paints.get(0).getSpectrum().getStart();
-        int samplestop = paints.get(0).getSpectrum().getStop();
-        int samplestep = paints.get(0).getSpectrum().getStep();
+        float[] resultSamples = new float[lights.get(0).getSpectrum().getSamples().length];
+        float[] interp = new float[lights.size()];
+        for(int i=0; i<values.length; i++) {
+            interp[i] = Byte.toUnsignedInt(values[i]) / 255.0f;
+        }
 
-        float[] mixresults = new float[samplesize];
-        Arrays.fill(mixresults, 0.0f);
-
-        for(int i=0; i<paints.size(); i++) {
-            for(int j=0; j<mixresults.length; j++) {
-                mixresults[j] += paints.get(i).getSpectrum().getSamples()[j] * Byte.toUnsignedInt(values[i]) / 255;
+        for (int i=0; i<resultSamples.length; i++) {
+            for(int j=0; i<values.length; i++) {
+                resultSamples[i] += interp[j] * lights.get(j).getSpectrum().getSamples()[i];
             }
         }
-        return new Spectrum(samplestart, samplestop, samplestep, mixresults, paints.get(0).getSpectrum().getIlluminant());
+
+        return new Spectrum(lights.get(0).getSpectrum(), resultSamples);
     }
 
     @Override
@@ -74,10 +84,11 @@ public class LinearMixSpace extends ColorSpace {
         Button acceptButton = new Button("Okay");
         acceptButton.setOnAction(e -> {
             int n = numPaintsInput.getValue();
-            paints = new ArrayList<>(n);
+            lights = new ArrayList<>(n);
             for(int i=0; i<n; i++) {
-                paints.add(Paint.getDefault());
+                lights.add(Paint.getDefault());
             }
+            ((Stage)window).close();
             finish.accept(this);
         });
         VBox dialogUI = new VBox(numPaintsRow, acceptButton);

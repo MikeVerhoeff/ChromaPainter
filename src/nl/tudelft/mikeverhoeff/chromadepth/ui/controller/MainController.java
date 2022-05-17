@@ -24,6 +24,7 @@ import nl.tudelft.mikeverhoeff.chromadepth.Paint;
 import nl.tudelft.mikeverhoeff.chromadepth.PaintMix;
 import nl.tudelft.mikeverhoeff.chromadepth.Painting;
 import nl.tudelft.mikeverhoeff.chromadepth.PaintingIO;
+import nl.tudelft.mikeverhoeff.chromadepth.colorspace.ImageCompare;
 import nl.tudelft.mikeverhoeff.chromadepth.colorspace.MyPrinterSimulator;
 import nl.tudelft.mikeverhoeff.chromadepth.painttools.PaintTool;
 import nl.tudelft.mikeverhoeff.chromadepth.preview.EyeShiftUI;
@@ -145,6 +146,12 @@ public class MainController implements Initializable {
             displayPainting(importedPainting);
             updateColorChange();
         }
+    }
+
+    @FXML
+    public void compareAction(ActionEvent event) {
+        ImageCompare compare = new ImageCompare();
+        compare.compareSpectralAndScreen(canvas.getPainting(), menuBar.getScene().getWindow());
     }
 
     @FXML

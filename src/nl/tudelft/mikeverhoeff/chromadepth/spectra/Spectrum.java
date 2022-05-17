@@ -99,6 +99,7 @@ public class Spectrum {
         float X=0;
         float Y=0;
         float Z=0;
+        float N=0;
 
         if (illuminant != null) {
             // calculate white point : my samples were reflective measured under D50
@@ -116,7 +117,11 @@ public class Spectrum {
                 X += X(sampleWavelength) * sd * sample * step;
                 Y += Y(sampleWavelength) * sd * sample * step;
                 Z += Z(sampleWavelength) * sd * sample * step;
+                N += Y(sampleWavelength) * sd * step;
             }
+            X = 1/N * X;
+            Y = 1/N * Y;
+            Z = 1/N * Z;
         } else {
             for (int j = 0; j < samples.length; j++) {
                 float sample = samples[j];
@@ -127,10 +132,10 @@ public class Spectrum {
             }
         }
         float mag = 1;//(float)Math.sqrt(X*X+Y*Y+Z*Z);
-        if(refXYZ != null) {
+        /*if(refXYZ != null) {
             mag = Y/refXYZ[1];
         }
-        //System.out.println(mag);
+        System.out.println(mag);*/
         X=X/mag;
         Y=Y/mag;
         Z=Z/mag;

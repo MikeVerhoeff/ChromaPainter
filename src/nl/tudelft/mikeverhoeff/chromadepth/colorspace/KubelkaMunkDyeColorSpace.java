@@ -1,5 +1,7 @@
 package nl.tudelft.mikeverhoeff.chromadepth.colorspace;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,29 +14,51 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import nl.tudelft.mikeverhoeff.chromadepth.Paint;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
+import nl.tudelft.mikeverhoeff.chromadepth.ui.controller.NewCanvasDialogController;
+import nl.tudelft.mikeverhoeff.chromadepth.ui.controller.PaintSlider;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class LinearMixSpace extends ColorSpace {
+public class KubelkaMunkDyeColorSpace extends ColorSpace {
 
-    private List<Paint> paints;
+    private List<Paint> dyes;
+    private Paint background;
 
-    public LinearMixSpace(List<Paint> paints) {
-        this.paints = paints;
+    public KubelkaMunkDyeColorSpace() {
+        background = Paint.getDefault();
     }
 
+    public KubelkaMunkDyeColorSpace(Paint background, List<Paint> dyes) {
+        this.background = background;
+        this.dyes = dyes;
+    }
+
+    public List<Paint> getDyes() {
+        return dyes;
+    }
+
+    public void setDyes(List<Paint> dyes) {
+        this.dyes = dyes;
+    }
+
+    public Paint getBackground() {
+        return background;
+    }
+
+    public void setBackground(Paint background) {
+        this.background = background;
+    }
 
     @Override
     public int getNumberOfChannels() {
-        return paints.size();
+        return dyes.size();
     }
 
     @Override
     public Paint getChanelColor(int channel) {
-        return paints.get(channel);
+        return dyes.get(channel);
     }
 
     @Override
@@ -44,20 +68,11 @@ public class LinearMixSpace extends ColorSpace {
 
     @Override
     public Spectrum getSpectrumForValues(byte[] values) {
-        int samplesize = paints.get(0).getSpectrum().getSamples().length;
-        int samplestart = paints.get(0).getSpectrum().getStart();
-        int samplestop = paints.get(0).getSpectrum().getStop();
-        int samplestep = paints.get(0).getSpectrum().getStep();
-
-        float[] mixresults = new float[samplesize];
-        Arrays.fill(mixresults, 0.0f);
-
-        for(int i=0; i<paints.size(); i++) {
-            for(int j=0; j<mixresults.length; j++) {
-                mixresults[j] += paints.get(i).getSpectrum().getSamples()[j] * Byte.toUnsignedInt(values[i]) / 255;
-            }
+        Spectrum[] spectrums = new Spectrum[dyes.size()];
+        for(int i=0; i<spectrums.length; i++) {
+            spectrums[i] = dyes.get(i).getSpectrum();
         }
-        return new Spectrum(samplestart, samplestop, samplestep, mixresults, paints.get(0).getSpectrum().getIlluminant());
+        return MixHelper.mixKubelkaMunkDyes(background.getSpectrum(), spectrums, values);
     }
 
     @Override
@@ -70,17 +85,20 @@ public class LinearMixSpace extends ColorSpace {
         Spinner<Integer> numPaintsInput = new Spinner<Integer>(new SpinnerValueFactory.IntegerSpinnerValueFactory(1,Integer.MAX_VALUE,6));
         HBox numPaintsRow = new HBox(numPaintsText, numPaintsInput);
 
+        Label backgroundText = new Label("Background Color:");
+        PaintSlider backgroundPaint = new PaintSlider(background, (byte)0);
+        HBox backgroundRow = new HBox(backgroundText, backgroundPaint);
 
         Button acceptButton = new Button("Okay");
         acceptButton.setOnAction(e -> {
             int n = numPaintsInput.getValue();
-            paints = new ArrayList<>(n);
+            dyes = new ArrayList<>(n);
             for(int i=0; i<n; i++) {
-                paints.add(Paint.getDefault());
+                dyes.add(Paint.getDefault());
             }
             finish.accept(this);
         });
-        VBox dialogUI = new VBox(numPaintsRow, acceptButton);
+        VBox dialogUI = new VBox(numPaintsRow, backgroundRow, acceptButton);
 
         Scene dialogScene = new Scene(dialogUI, 300, 200);
         dialog.setScene(dialogScene);

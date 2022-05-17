@@ -1,10 +1,24 @@
 package nl.tudelft.mikeverhoeff.chromadepth.colorspace;
 
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import nl.tudelft.mikeverhoeff.chromadepth.Paint;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
+import nl.tudelft.mikeverhoeff.chromadepth.spectra.SpectrumIO;
+import nl.tudelft.mikeverhoeff.chromadepth.ui.controller.PaintSlider;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class CMYKColorSpace extends ColorSpace {
 
@@ -92,7 +106,7 @@ public class CMYKColorSpace extends ColorSpace {
         interp[2] = Byte.toUnsignedInt(values[2])/255.0f;
         interp[3] = Byte.toUnsignedInt(values[3])/255.0f;
 
-        for (int i=0; i<resultSamples.length; i++) {
+        /*for (int i=0; i<resultSamples.length; i++) {
 
             // implementation: kubelka-munk
             float scale = 10000;
@@ -161,7 +175,9 @@ public class CMYKColorSpace extends ColorSpace {
         return new Spectrum(
                 backgroundColor.getStart(), backgroundColor.getStop(), backgroundColor.getStep(),
                 resultSamples, backgroundColor.getIlluminant()
-        );
+        );*/
+        //return MixHelper.mixKubelkaMunkDyes(backgroundColor, new Spectrum[]{cyan, magenta, yellow, key}, values);
+        return MixHelper.mixYNSN(backgroundColor, new Spectrum[]{cyan, magenta, yellow, key}, values);
     }
 
     public float getMaxIntensity() {
@@ -169,5 +185,19 @@ public class CMYKColorSpace extends ColorSpace {
                 Math.max(cyan.getMaxSampleValue(),
                         Math.max(yellow.getMaxSampleValue(),
                                 Math.max(cyan.getMaxSampleValue(), key.getMaxSampleValue()))));
+    }
+
+    @Override
+    public void configureGUI(Window window, Consumer<ColorSpace> finish) {
+        try {
+            this.setBackgroundColor(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\50_m1.txt")).get(0));
+            this.setCyan(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\06_m1.txt")).get(0));
+            this.setYellow(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\01_m1.txt")).get(0));
+            this.setMagenta(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\05_m1.txt")).get(0));
+            this.setKey(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\46_m1.txt")).get(0));
+            finish.accept(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

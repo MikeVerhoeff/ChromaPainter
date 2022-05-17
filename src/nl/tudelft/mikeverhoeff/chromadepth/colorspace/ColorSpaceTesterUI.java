@@ -98,13 +98,16 @@ public class ColorSpaceTesterUI implements Initializable {
             colorSpace.setYellow(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\01_m1.txt")).get(0));
             colorSpace.setMagenta(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\05_m1.txt")).get(0));
             colorSpace.setKey(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\46_m1.txt")).get(0));
-            resultSpectrum.setMaxValue(colorSpace.getMaxIntensity());
-            referenceSpectrum.setMaxValue(colorSpace.getMaxIntensity());
+            //resultSpectrum.setMaxValue(colorSpace.getMaxIntensity());
+            //referenceSpectrum.setMaxValue(colorSpace.getMaxIntensity());
+            resultSpectrum.setMaxValue(1);
+            referenceSpectrum.setMaxValue(1);
         } catch (Exception exception) {
             exception.printStackTrace();
         }
 
         SpectrogramChart wchart = new SpectrogramChart();
+        wchart.setMaxValue(1);
         wchart.displayColorSpectrum(colorSpace.getBackgroundColor());
         Pane wpane = new Pane();
         setPaneColor(wpane, colorSpace.getBackgroundColor().getArgb());
@@ -115,6 +118,7 @@ public class ColorSpaceTesterUI implements Initializable {
 
 
         SpectrogramChart cchart = new SpectrogramChart();
+        cchart.setMaxValue(1);
         cchart.displayColorSpectrum(colorSpace.getCyan());
         Pane cpane = new Pane();
         setPaneColor(cpane, colorSpace.getCyan().getArgb());
@@ -125,6 +129,7 @@ public class ColorSpaceTesterUI implements Initializable {
 
 
         SpectrogramChart mchart = new SpectrogramChart();
+        mchart.setMaxValue(1);
         mchart.displayColorSpectrum(colorSpace.getMagenta());
         Pane mpane = new Pane();
         setPaneColor(mpane, colorSpace.getMagenta().getArgb());
@@ -135,6 +140,7 @@ public class ColorSpaceTesterUI implements Initializable {
 
 
         SpectrogramChart ychart = new SpectrogramChart();
+        ychart.setMaxValue(1);
         ychart.displayColorSpectrum(colorSpace.getYellow());
         Pane ypane = new Pane();
         setPaneColor(ypane, colorSpace.getYellow().getArgb());
@@ -144,6 +150,7 @@ public class ColorSpaceTesterUI implements Initializable {
         primariesBox.getChildren().add(ybox);
 
         SpectrogramChart kchart = new SpectrogramChart();
+        kchart.setMaxValue(1);
         kchart.displayColorSpectrum(colorSpace.getKey());
         Pane kpane = new Pane();
         setPaneColor(kpane, colorSpace.getKey().getArgb());
