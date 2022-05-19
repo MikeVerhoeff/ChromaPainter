@@ -12,6 +12,8 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import nl.tudelft.mikeverhoeff.chromadepth.ui.controller.MainController;
+import org.opencv.calib3d.StereoBM;
+import org.opencv.calib3d.StereoSGBM;
 
 public class EyeShiftUI extends VBox {
 
@@ -19,11 +21,13 @@ public class EyeShiftUI extends VBox {
     private ImageView rightImage;
     private ImageView animatedImage;
     private Label debugTextLabel;
+    private ImageView depthMapImage;
 
     private boolean doAnimate = false;
     private Image[] frames;
 
     private Spinner<Double> distanceSelector;
+    private Spinner<Integer> fixedWavelengthSelector;
 
     private MainController mainController;
 
@@ -32,13 +36,21 @@ public class EyeShiftUI extends VBox {
         leftImage = new ImageView();
         rightImage = new ImageView();
         animatedImage = new ImageView();
-        distanceSelector = new Spinner<Double>(new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE, 0.4, 0.1));
+        depthMapImage = new ImageView();
+        distanceSelector = new Spinner<Double>(new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE, 0.4, 0.05));
         distanceSelector.setEditable(true);
         distanceSelector.setMinWidth(60);
+        fixedWavelengthSelector = new Spinner<Integer>(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 1000, 460, 10));
+        fixedWavelengthSelector.setEditable(true);
 
         HBox box = new HBox();
         box.getChildren().add(new Label("Distance to painting (m):"));
         box.getChildren().add(distanceSelector);
+
+        Spinner<Integer> numDisparSelector = new Spinner<>(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 200, 16));
+        numDisparSelector.setEditable(true);
+        Spinner<Integer> blockSizeSelector = new Spinner<>(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 200, 15));
+        blockSizeSelector.setEditable(true);
 
         Button calcButton = new Button("Calculate result");
         calcButton.setOnAction(event -> {
@@ -47,10 +59,10 @@ public class EyeShiftUI extends VBox {
             ShiftedImageCalculator calculator = new ShiftedImageCalculator(mainController.getCanvas().getPainting());
             calculator.splitImage();
             //Image image = calculator.simpleUniformShift((float)(double)distanceSelector.getValue());
-            Image image = calculator.getImageAtDistance((float)(double)distanceSelector.getValue(), 1, 0.26e-3);
-            leftImage.setImage(image);
+            Image imageLeft = calculator.getImageAtDistance((float)(double)distanceSelector.getValue(), 1, fixedWavelengthSelector.getValue(), 0.26e-3);
+            leftImage.setImage(imageLeft);
 
-            Image imageRight = calculator.getImageAtDistance((float)(double)distanceSelector.getValue(), -1, 0.26e-3);
+            Image imageRight = calculator.getImageAtDistance((float)(double)distanceSelector.getValue(), -1, fixedWavelengthSelector.getValue(), 0.26e-3);
             this.rightImage.setImage(imageRight);
 
 
@@ -58,17 +70,23 @@ public class EyeShiftUI extends VBox {
             for(int i=0; i<frames.length; i++) {
                 float eye = (i/ (float)(frames.length-1))*2-1;
                 System.out.println(eye);
-                frames[i] = calculator.getImageAtDistance((float)(double)distanceSelector.getValue(), eye, 0.26e-3);
+                frames[i] = calculator.getImageAtDistance((float)(double)distanceSelector.getValue(), eye, fixedWavelengthSelector.getValue(), 0.26e-3);
             }
+
+            StereoBM stereoBM = StereoBM.create(numDisparSelector.getValue(), blockSizeSelector.getValue());
+            StereoSGBM stereoSGBM = StereoSGBM.create(numDisparSelector.getValue(), blockSizeSelector.getValue());
+            depthMapImage.setImage(StereoDepthMap.OpenCVStereoDepthEstimationBlockMatching(imageLeft, imageRight, stereoBM));
 
             doAnimate = true;
         });
 
         this.getChildren().add(box);
+        this.getChildren().add(new HBox(new Label("Static wavelength:"), fixedWavelengthSelector));
+        this.getChildren().addAll(numDisparSelector, blockSizeSelector);
         this.getChildren().add(calcButton);
-        this.getChildren().add(leftImage);
-        this.getChildren().add(rightImage);
+        this.getChildren().add(new FlowPane(leftImage, rightImage));
         this.getChildren().add(animatedImage);
+        this.getChildren().add(depthMapImage);
 
         debugTextLabel = new Label();
         this.getChildren().add(debugTextLabel);

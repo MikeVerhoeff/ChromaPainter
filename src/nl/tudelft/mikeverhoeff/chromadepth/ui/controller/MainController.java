@@ -74,12 +74,13 @@ public class MainController implements Initializable {
 
         Painting painting = new Painting(150, 150, new MyPrinterSimulator());
 
-        painting.setSquare(10,10, 10, 10, red);
-        painting.setSquare(10,20, 10, 10, yellow);
-        painting.setSquare(20,10, 10, 10, green);
-        painting.setSquare(20,20, 10, 10, cyan);
-        painting.setSquare(30,10, 10, 10, blue);
-        painting.setSquare(30,20, 10, 10, magenta);
+        int spacing=3;
+        painting.setSquare(10*spacing,10*spacing, 10, 10, red);
+        painting.setSquare(10*spacing,20*spacing, 10, 10, yellow);
+        painting.setSquare(20*spacing,10*spacing, 10, 10, green);
+        painting.setSquare(20*spacing,20*spacing, 10, 10, cyan);
+        painting.setSquare(30*spacing,10*spacing, 10, 10, blue);
+        painting.setSquare(30*spacing,20*spacing, 10, 10, magenta);
 
         //CanvasImage.setImage(painting.getImage());
         displayPainting(painting);

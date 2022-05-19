@@ -70,23 +70,33 @@ public class ShiftedImageCalculator {
 
     }
 
-    public Image getImageAtDistance(double distance, double eye, double pixelsize) {
-        double blueShift = calculateShift(start, distance, eye)/pixelsize;
-        double redShift = calculateShift(end, distance, eye)/pixelsize;
+    public Image getImageAtDistance(double distance, double eye, int fixedwavelength, double pixelsize) {
+        //final int fixedwavelength = 500;
+        int fixedoffset = (int)(calculateShift(fixedwavelength, distance, eye)/pixelsize);
+        System.out.println("fixed offset: " + fixedoffset);
+
+        double blueShift = calculateShift(start, distance, 1)/pixelsize;
+        double redShift = calculateShift(end, distance, 1)/pixelsize;
 
         int minShift = (int)Math.floor(Math.min(blueShift, redShift));
         int maxShift = (int)Math.ceil(Math.max(blueShift, redShift));
+        minShift = -maxShift;
         int extraSpace = maxShift-minShift;
 
         int samplecount = (end-start)/step+1;
         int shiftedWidth = painting.getWidth()+extraSpace;
         shiftedImage = new float[shiftedWidth][painting.getHeight()][samplecount];
 
+
+        System.out.println("Min shift: "+minShift+", Max shift: "+maxShift);
         // shift the spectra
-        for (int x=0; x<painting.getWidth(); x++) {
-            for (int y=0; y<painting.getHeight(); y++) {
-                for(int s=0; s<samplecount; s++) {
-                    shiftedImage[x-minShift+(int)(calculateShift(start+s*step, distance, eye)/pixelsize)][y][s] = spectralData[x][y][s];
+        System.out.println("calculating shifted image");
+        for(int s=0; s<samplecount; s++) {
+            int calculatedShift = (int)(calculateShift(start+s*step, distance, eye)/pixelsize);
+            System.out.println("sample layer "+s+" : "+calculatedShift);
+            for (int x=0; x<painting.getWidth(); x++) {
+                for (int y=0; y<painting.getHeight(); y++) {
+                    shiftedImage[x-minShift+calculatedShift-fixedoffset][y][s] = spectralData[x][y][s];
                 }
             }
         }
