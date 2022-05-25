@@ -4,13 +4,12 @@ import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Slider;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import nl.tudelft.mikeverhoeff.chromadepth.spectra.ColorSpaceConverter;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.SpectrogramChart;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.SpectrumIO;
@@ -36,6 +35,12 @@ public class ColorSpaceTesterUI implements Initializable {
 
     @FXML
     private StackPane resultspectrumSpace;
+
+    @FXML
+    private Label referenceInfoLabel;
+
+    @FXML
+    private CheckBox colorSpaceToggle;
 
     @FXML
     private Slider sliderC;
@@ -67,18 +72,32 @@ public class ColorSpaceTesterUI implements Initializable {
             setPaneColor(referenceColorSpace, spectrum.getArgb());
             referenceSpectrum.displayColorSpectrum(spectrum);
             spectrumReference = spectrum;
+
+            updateCompareInfo();
         }));
     }
     private SpectrogramChart resultSpectrum;
     private SpectrogramChart referenceSpectrum;
     private float X=0, Y=0, Z=0;
     private Spectrum spectrumReference;
+    private Spectrum spectrumResult;
 
     private CMYKColorSpace colorSpace;
     private MyPrinterSimulator printerSpace;
 
     private void setPaneColor(Pane pane, int screencolor) {
         pane.setStyle("-fx-background-color: rgb("+((screencolor>>16) & 0xff)+","+((screencolor>>8) & 0xff)+","+((screencolor) & 0xff)+")");
+    }
+
+    private void updateCompareInfo() {
+        if(spectrumReference != null && spectrumResult != null) {
+            float[] referenceXYZ = spectrumReference.getXYZ();
+            float[] resultXYZ = spectrumResult.getXYZ();
+            float[] referenceLab = ColorSpaceConverter.XYZtoLab(referenceXYZ);
+            float[] resultLab = ColorSpaceConverter.XYZtoLab(resultXYZ);
+            float deltaE = ColorSpaceConverter.deltaE_1976_FromLab(referenceLab, resultLab);
+            referenceInfoLabel.setText("DeltaE(1976): "+deltaE);
+        }
     }
 
     @Override
@@ -171,6 +190,7 @@ public class ColorSpaceTesterUI implements Initializable {
         sliderK.valueProperty().addListener(this::onSliderChange);
 
         onSliderChange(null);
+        colorSpaceToggle.setOnAction(e->onSliderChange(null));
     }
 
     private void onSliderChange(Observable observable) {
@@ -184,8 +204,13 @@ public class ColorSpaceTesterUI implements Initializable {
         spinnerY.getValueFactory().setValue(sliderY.getValue());
         spinnerK.getValueFactory().setValue(sliderK.getValue());
 
-        //Spectrum result = colorSpace.getSpectrumForValues(values);
-        Spectrum result = printerSpace.getSpectrumForValues(values);
+        Spectrum result;
+        if(colorSpaceToggle.isSelected()) {
+            result = colorSpace.getSpectrumForValues(values);
+        } else {
+            result = printerSpace.getSpectrumForValues(values);
+        }
+        spectrumResult = result;
 
         resultSpectrum.displayColorSpectrum(result);
         setPaneColor(resultcolorSpace, result.getArgb());
@@ -203,5 +228,7 @@ public class ColorSpaceTesterUI implements Initializable {
             System.out.println("Delta XYZ: " + (X - resXYZ[0]) + ", " + (Y - resXYZ[1]) + ", " + (Z - resXYZ[2]));
             System.out.println("Delta RGB: " + (refR-resR) + ", " + (refG-resG) + ", " + (refB-resB));
         }
+
+        updateCompareInfo();
     }
 }

@@ -11,9 +11,14 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import nl.tudelft.mikeverhoeff.chromadepth.Paint;
+import nl.tudelft.mikeverhoeff.chromadepth.spectra.ColorMatchingFunctions;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
+import nl.tudelft.mikeverhoeff.chromadepth.spectra.SpectrumIO;
 import nl.tudelft.mikeverhoeff.chromadepth.ui.controller.PaintSlider;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -59,10 +64,11 @@ public class AdditiveColorSpace extends ColorSpace {
         float[] interp = new float[lights.size()];
         for(int i=0; i<values.length; i++) {
             interp[i] = Byte.toUnsignedInt(values[i]) / 255.0f;
+            interp[i] = ColorMatchingFunctions.inverseGammaCorrect(interp[i]);
         }
 
         for (int i=0; i<resultSamples.length; i++) {
-            for(int j=0; i<values.length; i++) {
+            for(int j=0; j<values.length; j++) {
                 resultSamples[i] += interp[j] * lights.get(j).getSpectrum().getSamples()[i];
             }
         }
@@ -96,5 +102,31 @@ public class AdditiveColorSpace extends ColorSpace {
         Scene dialogScene = new Scene(dialogUI, 300, 200);
         dialog.setScene(dialogScene);
         dialog.show();
+    }
+
+    @Override
+    public void saveToWriter(DataOutputStream writer) {
+        try {
+            writer.writeInt(lights.size());
+            for(Paint light : lights) {
+                SpectrumIO.saveToWriter(light.getSpectrum(), writer);
+            }
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    @Override
+    public void loadFromReader(DataInputStream reader) {
+        try {
+            int count = reader.readInt();
+            lights = new ArrayList<Paint>(count);
+            for(int i=0; i<count; i++) {
+                Paint light = new Paint(SpectrumIO.loadFromReader(reader));
+                lights.add(light);
+            }
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
     }
 }

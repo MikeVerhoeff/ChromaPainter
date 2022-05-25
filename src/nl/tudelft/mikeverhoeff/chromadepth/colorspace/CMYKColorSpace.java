@@ -1,23 +1,12 @@
 package nl.tudelft.mikeverhoeff.chromadepth.colorspace;
 
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.stage.Window;
 import nl.tudelft.mikeverhoeff.chromadepth.Paint;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.SpectrumIO;
-import nl.tudelft.mikeverhoeff.chromadepth.ui.controller.PaintSlider;
 
+import java.io.DataInputStream;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 
 public class CMYKColorSpace extends ColorSpace {
@@ -27,6 +16,8 @@ public class CMYKColorSpace extends ColorSpace {
     private Spectrum magenta;
     private Spectrum yellow;
     private Spectrum key;
+
+    Spectrum[] neugebauerPrimaries = null;
 
     public CMYKColorSpace() {
 
@@ -38,6 +29,7 @@ public class CMYKColorSpace extends ColorSpace {
 
     public void setBackgroundColor(Spectrum backgroundColor) {
         this.backgroundColor = backgroundColor;
+        this.neugebauerPrimaries = null;
     }
 
     public Spectrum getCyan() {
@@ -46,6 +38,7 @@ public class CMYKColorSpace extends ColorSpace {
 
     public void setCyan(Spectrum cyan) {
         this.cyan = cyan;
+        this.neugebauerPrimaries = null;
     }
 
     public Spectrum getMagenta() {
@@ -54,6 +47,7 @@ public class CMYKColorSpace extends ColorSpace {
 
     public void setMagenta(Spectrum magenta) {
         this.magenta = magenta;
+        this.neugebauerPrimaries = null;
     }
 
     public Spectrum getYellow() {
@@ -62,6 +56,7 @@ public class CMYKColorSpace extends ColorSpace {
 
     public void setYellow(Spectrum yellow) {
         this.yellow = yellow;
+        this.neugebauerPrimaries = null;
     }
 
     public Spectrum getKey() {
@@ -70,6 +65,7 @@ public class CMYKColorSpace extends ColorSpace {
 
     public void setKey(Spectrum key) {
         this.key = key;
+        this.neugebauerPrimaries = null;
     }
 
     @Override
@@ -177,7 +173,14 @@ public class CMYKColorSpace extends ColorSpace {
                 resultSamples, backgroundColor.getIlluminant()
         );*/
         //return MixHelper.mixKubelkaMunkDyes(backgroundColor, new Spectrum[]{cyan, magenta, yellow, key}, values);
-        return MixHelper.mixYNSN(backgroundColor, new Spectrum[]{cyan, magenta, yellow, key}, values);
+
+        if(neugebauerPrimaries == null) {
+            neugebauerPrimaries = MixHelper.createNeugebauerPrimaries(backgroundColor, new Spectrum[]{cyan, magenta, yellow, key});
+        }
+        float[] nbpMix = MixHelper.createNeugebauerMix(values);
+        return  MixHelper.mixNeugebauerPrimaries(backgroundColor, neugebauerPrimaries, nbpMix);
+
+        //return MixHelper.mixYNSN(backgroundColor, new Spectrum[]{cyan, magenta, yellow, key}, values);
     }
 
     public float getMaxIntensity() {
@@ -199,5 +202,10 @@ public class CMYKColorSpace extends ColorSpace {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void loadFromReader(DataInputStream reader) {
+        configureGUI(null, (s)->{});
     }
 }

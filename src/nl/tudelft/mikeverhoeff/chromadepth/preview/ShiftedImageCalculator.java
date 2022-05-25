@@ -71,9 +71,14 @@ public class ShiftedImageCalculator {
     }
 
     public Image getImageAtDistance(double distance, double eye, int fixedwavelength, double pixelsize) {
+        return getImageAtDistance(distance, eye, fixedwavelength, pixelsize, 4);
+    }
+
+
+    public Image getImageAtDistance(double distance, double eye, int fixedwavelength, double pixelsize, int subpixels) {
         //final int fixedwavelength = 500;
-        int fixedoffset = (int)(calculateShift(fixedwavelength, distance, eye)/pixelsize);
-        System.out.println("fixed offset: " + fixedoffset);
+        double fixedoffset = (calculateShift(fixedwavelength, distance, eye)/pixelsize);
+        //System.out.println("fixed offset: " + fixedoffset);
 
         double blueShift = calculateShift(start, distance, 1)/pixelsize;
         double redShift = calculateShift(end, distance, 1)/pixelsize;
@@ -85,27 +90,29 @@ public class ShiftedImageCalculator {
 
         int samplecount = (end-start)/step+1;
         int shiftedWidth = painting.getWidth()+extraSpace;
-        shiftedImage = new float[shiftedWidth][painting.getHeight()][samplecount];
+        shiftedImage = new float[shiftedWidth*subpixels][painting.getHeight()][samplecount];
 
 
-        System.out.println("Min shift: "+minShift+", Max shift: "+maxShift);
+        //System.out.println("Min shift: "+minShift+", Max shift: "+maxShift);
         // shift the spectra
         System.out.println("calculating shifted image");
         for(int s=0; s<samplecount; s++) {
-            int calculatedShift = (int)(calculateShift(start+s*step, distance, eye)/pixelsize);
-            System.out.println("sample layer "+s+" : "+calculatedShift);
+            double calculatedShift = calculateShift(start+s*step, distance, eye)/pixelsize;
+            //System.out.println("sample layer "+s+" : "+calculatedShift);
             for (int x=0; x<painting.getWidth(); x++) {
                 for (int y=0; y<painting.getHeight(); y++) {
-                    shiftedImage[x-minShift+calculatedShift-fixedoffset][y][s] = spectralData[x][y][s];
+                    for(int sp=0; sp<subpixels; sp++) {
+                        shiftedImage[(int)( (x - minShift + calculatedShift - fixedoffset)*subpixels+sp)][y][s] = spectralData[x][y][s];
+                    }
                 }
             }
         }
 
-        WritableImage image = new WritableImage(shiftedWidth, painting.getHeight());
+        WritableImage image = new WritableImage(shiftedWidth*subpixels, painting.getHeight());
         PixelWriter writer = image.getPixelWriter();
 
         // calculate the screen color for the spectra
-        for (int x = 0; x < shiftedWidth; x++) {
+        for (int x = 0; x < shiftedWidth*subpixels; x++) {
             for (int y = 0; y < painting.getHeight(); y++) {
                 //int color = new Spectrum(start, end, step, shiftedImage[x][y]).getArgb();
                 int color = new Spectrum(painting.getPaints().get(0).getSpectrum(), shiftedImage[x][y]).getArgb();

@@ -144,4 +144,35 @@ public class SpectrumIO {
         context.put("NUMBER_OF_SETS", entries.size());
     }
 
+    public static void saveToWriter(Spectrum spectrum, DataOutputStream writer) throws IOException {
+        writer.writeInt(spectrum.getStart());
+        writer.writeInt(spectrum.getStop());
+        writer.writeInt(spectrum.getStep());
+        for(float s:spectrum.getSamples()) {
+            writer.writeFloat(s);
+        }
+        if(spectrum.getIlluminant() !=null && spectrum.getIlluminant().equals("D50")) {
+            writer.writeInt(5);
+        } else {
+            writer.writeInt(0);
+        }
+    }
+
+    public static Spectrum loadFromReader(DataInputStream reader) throws IOException {
+        int start = reader.readInt();
+        int stop = reader.readInt();
+        int step = reader.readInt();
+        int count = (stop-start)/step+1;
+        float[] samples = new float[count];
+        for(int i=0; i<samples.length; i++) {
+            samples[i] = reader.readFloat();
+        }
+        String illuminant=null;
+        if(reader.readInt()==5) {
+            illuminant = "D50";
+        }
+
+        return new Spectrum(start, stop, step, samples, illuminant);
+    }
+
 }

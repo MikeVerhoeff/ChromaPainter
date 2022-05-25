@@ -1,6 +1,7 @@
 package nl.tudelft.mikeverhoeff.chromadepth.preview;
 
 import javafx.animation.AnimationTimer;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,9 +12,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import nl.tudelft.mikeverhoeff.chromadepth.ui.controller.MainController;
 import org.opencv.calib3d.StereoBM;
 import org.opencv.calib3d.StereoSGBM;
+
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
 
 public class EyeShiftUI extends VBox {
 
@@ -22,6 +28,7 @@ public class EyeShiftUI extends VBox {
     private ImageView animatedImage;
     private Label debugTextLabel;
     private ImageView depthMapImage;
+    private Button exportButton;
 
     private boolean doAnimate = false;
     private Image[] frames;
@@ -42,6 +49,8 @@ public class EyeShiftUI extends VBox {
         distanceSelector.setMinWidth(60);
         fixedWavelengthSelector = new Spinner<Integer>(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 1000, 460, 10));
         fixedWavelengthSelector.setEditable(true);
+        exportButton = new Button("Export");
+        exportButton.setVisible(false);
 
         HBox box = new HBox();
         box.getChildren().add(new Label("Distance to painting (m):"));
@@ -51,6 +60,8 @@ public class EyeShiftUI extends VBox {
         numDisparSelector.setEditable(true);
         Spinner<Integer> blockSizeSelector = new Spinner<>(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 200, 15));
         blockSizeSelector.setEditable(true);
+        Spinner<Integer> subPixelSelector = new Spinner<>(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 16, 1));
+        subPixelSelector.setEditable(true);
 
         Button calcButton = new Button("Calculate result");
         calcButton.setOnAction(event -> {
@@ -59,10 +70,10 @@ public class EyeShiftUI extends VBox {
             ShiftedImageCalculator calculator = new ShiftedImageCalculator(mainController.getCanvas().getPainting());
             calculator.splitImage();
             //Image image = calculator.simpleUniformShift((float)(double)distanceSelector.getValue());
-            Image imageLeft = calculator.getImageAtDistance((float)(double)distanceSelector.getValue(), 1, fixedWavelengthSelector.getValue(), 0.26e-3);
+            Image imageLeft = calculator.getImageAtDistance((float)(double)distanceSelector.getValue(), 1, fixedWavelengthSelector.getValue(), 0.26e-3, subPixelSelector.getValue());
             leftImage.setImage(imageLeft);
 
-            Image imageRight = calculator.getImageAtDistance((float)(double)distanceSelector.getValue(), -1, fixedWavelengthSelector.getValue(), 0.26e-3);
+            Image imageRight = calculator.getImageAtDistance((float)(double)distanceSelector.getValue(), -1, fixedWavelengthSelector.getValue(), 0.26e-3, subPixelSelector.getValue());
             this.rightImage.setImage(imageRight);
 
 
@@ -70,12 +81,29 @@ public class EyeShiftUI extends VBox {
             for(int i=0; i<frames.length; i++) {
                 float eye = (i/ (float)(frames.length-1))*2-1;
                 System.out.println(eye);
-                frames[i] = calculator.getImageAtDistance((float)(double)distanceSelector.getValue(), eye, fixedWavelengthSelector.getValue(), 0.26e-3);
+                frames[i] = calculator.getImageAtDistance((float)(double)distanceSelector.getValue(), eye, fixedWavelengthSelector.getValue(), 0.26e-3, subPixelSelector.getValue());
             }
 
             StereoBM stereoBM = StereoBM.create(numDisparSelector.getValue(), blockSizeSelector.getValue());
             StereoSGBM stereoSGBM = StereoSGBM.create(numDisparSelector.getValue(), blockSizeSelector.getValue());
-            depthMapImage.setImage(StereoDepthMap.OpenCVStereoDepthEstimationBlockMatching(imageLeft, imageRight, stereoBM));
+            Image disparityMap = StereoDepthMap.OpenCVStereoDepthEstimationBlockMatching(imageLeft, imageRight, stereoBM);
+            depthMapImage.setImage(disparityMap);
+
+            exportButton.setVisible(true);
+            exportButton.setOnAction(e -> {
+                DirectoryChooser exportLocationChooser = new DirectoryChooser();
+                File saveFolder = exportLocationChooser.showDialog(this.getScene().getWindow());
+                if(saveFolder != null) {
+                    try {
+                        saveImage(imageLeft, saveFolder, "left.png");
+                        saveImage(imageRight, saveFolder, "right.png");
+                        saveImage(disparityMap, saveFolder, "disparity.png");
+                        saveImage(calculator.getImageAtDistance(distanceSelector.getValue(), 0, 530, 0.26e-3, subPixelSelector.getValue()), saveFolder, "normal.png");
+                    } catch (IOException exception) {
+                        exception.printStackTrace();
+                    }
+                }
+            });
 
             doAnimate = true;
         });
@@ -83,10 +111,12 @@ public class EyeShiftUI extends VBox {
         this.getChildren().add(box);
         this.getChildren().add(new HBox(new Label("Static wavelength:"), fixedWavelengthSelector));
         this.getChildren().addAll(numDisparSelector, blockSizeSelector);
+        this.getChildren().add(new HBox(new Label("Shifting subpixels:"), subPixelSelector));
         this.getChildren().add(calcButton);
         this.getChildren().add(new FlowPane(leftImage, rightImage));
         this.getChildren().add(animatedImage);
         this.getChildren().add(depthMapImage);
+        this.getChildren().add(exportButton);
 
         debugTextLabel = new Label();
         this.getChildren().add(debugTextLabel);
@@ -117,6 +147,11 @@ public class EyeShiftUI extends VBox {
             }
         };
         animationTimer.start();
+    }
+
+    private void saveImage(Image image, File folder, String filename) throws IOException {
+        File imageFile = new File(folder, filename);
+        ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", imageFile);
     }
 
     public void setMainController(MainController mainController) {

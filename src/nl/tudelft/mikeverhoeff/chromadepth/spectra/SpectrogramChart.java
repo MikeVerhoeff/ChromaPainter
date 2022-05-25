@@ -1,17 +1,64 @@
 package nl.tudelft.mikeverhoeff.chromadepth.spectra;
 
+import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.image.WritableImage;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.stage.FileChooser;
 
-public class SpectrogramChart extends Canvas {
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
+
+public class SpectrogramChart extends AnchorPane {
+
+    private Canvas chartCanvas;
+    private Button exportButton;
 
     float maxValue = -1;
 
     public SpectrogramChart() {
-        super(200, 200);
-        System.out.println("chart test");
+        this.setWidth(200);
+        this.setHeight(200);
+        chartCanvas = new Canvas(200, 200);
+        //System.out.println("chart test");
+        this.getChildren().add(chartCanvas);
+        AnchorPane.setTopAnchor(chartCanvas, 0.0);
+        AnchorPane.setLeftAnchor(chartCanvas, 0.0);
+
+        this.exportButton = new Button("export");
+        this.getChildren().add(exportButton);
+        AnchorPane.setTopAnchor(exportButton, 5.0);
+        AnchorPane.setLeftAnchor(exportButton, 5.0);
+        exportButton.setVisible(false);
+        exportButton.setOnAction(this::exportButtonAction);
+
+        this.setOnMouseEntered(e->exportButton.setVisible(true));
+        this.setOnMouseExited(e->exportButton.setVisible(false));
+
+    }
+
+    private void exportButtonAction(ActionEvent e) {
+        exportButton.setVisible(false);
+        WritableImage snapshot = chartCanvas.snapshot(null, null);
+        exportButton.setVisible(true);
+        FileChooser exportLocationChooser = new FileChooser();
+        File exportLocation = exportLocationChooser.showSaveDialog(exportButton.getScene().getWindow());
+        if(exportLocation != null) {
+            try {
+                System.out.println("Exporting to: "+exportLocation.getAbsolutePath());
+                ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", exportLocation);
+            } catch (IOException exception) {
+                System.err.println("Could not save chart to: "+exportLocation.getAbsolutePath()+" ("+exception.getLocalizedMessage()+")");
+            }
+        }
     }
 
     public void setMaxValue(float value) {
@@ -19,8 +66,8 @@ public class SpectrogramChart extends Canvas {
     }
 
     public void displayColorSpectrum(Spectrum spectrum) {
-        double width = this.getWidth();
-        double height = this.getHeight();
+        double width = chartCanvas.getWidth();
+        double height = chartCanvas.getHeight();
 
         float maxIntensity = 0;
         if(maxValue>0) {
@@ -34,14 +81,14 @@ public class SpectrogramChart extends Canvas {
         }
 
         if(maxIntensity == 0) {
-            this.getGraphicsContext2D().clearRect(0, 0, width, height);
+            chartCanvas.getGraphicsContext2D().clearRect(0, 0, width, height);
             return;
         }
 
         double widthStep = width/spectrum.getSamples().length;
         double heightStep = height/maxIntensity;
 
-        GraphicsContext draw = this.getGraphicsContext2D();
+        GraphicsContext draw = chartCanvas.getGraphicsContext2D();
         draw.clearRect(0, 0, width, height);
         for(int x=0; x<width; x++) {
             int wavelength = (int)(spectrum.getStart() + x/widthStep * spectrum.getStep());

@@ -133,11 +133,19 @@ public class ColorMatchingFunctions {
         return (((int)r)&0xff)<<16 | (((int)g)&0xff)<<8 | (((int)b)&0xff);
     }
 
-    private static float gammaCorrect(float c) {
+    public static float gammaCorrect(float c) {
         if(c<=0.0031308) {
             return Math.min(1.0f,12.92f*c);
         } else {
             return (float) Math.min(1.0,1.055 * Math.pow(c, 1/2.4) - 0.055);
+        }
+    }
+
+    public static float inverseGammaCorrect(float ic) {
+        if(ic<0.04) {
+            return ic / 12.92f;
+        } else {
+            return  (float) Math.pow((ic + 0.055) / 1.055, 2.4 / 1);
         }
     }
 

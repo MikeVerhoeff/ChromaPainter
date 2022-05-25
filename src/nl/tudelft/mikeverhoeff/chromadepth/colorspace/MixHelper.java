@@ -128,4 +128,53 @@ public class MixHelper {
         return new Spectrum(background, resultSamples);
     }
 
+    public static Spectrum[] createNeugebauerPrimaries(Spectrum background, Spectrum ... primaries) {
+        int nbpCount = (int) Math.pow(2, primaries.length);
+        Spectrum[] nbp = new Spectrum[nbpCount];
+
+        byte[] mix = new byte[primaries.length];
+        for(int i=0; i<nbpCount; i++) {
+
+            for(int j=0; j<primaries.length; j++) {
+                mix[j] = ((i&(1<<j)) != 0) ? (byte)255 : (byte)0;
+            }
+
+            nbp[i] = mixKubelkaMunkDyes(background, primaries, mix);
+        }
+
+        return nbp;
+    }
+
+    public static float[] createNeugebauerMix(byte[] baseMix) {
+        int nbpCount = (int) Math.pow(2, baseMix.length);
+        float[] nbpMix = new float[nbpCount];
+
+        float[] interp = new float[baseMix.length];
+        for(int i=0; i<baseMix.length; i++) {
+            interp[i] = Byte.toUnsignedInt(baseMix[i]) / 255.0f;
+        }
+
+        for(int i=0; i<nbpCount; i++) {
+
+            nbpMix[i] = 1;
+            for (int j = 0; j < baseMix.length; j++) {
+                nbpMix[i] *= ((i&(1<<j)) != 0) ? interp[j] : (1-interp[j]);
+            }
+        }
+        return nbpMix;
+    }
+
+    public static Spectrum mixNeugebauerPrimaries(Spectrum background, Spectrum[] primaries, float[] mix) {
+        float[] resultSamples = new float[background.getSamples().length];
+        for (int i=0; i<resultSamples.length; i++) {
+
+            resultSamples[i] = 0;
+            for(int j=0; j< primaries.length; j++) {
+                resultSamples[i] += primaries[j].getSamples()[i] * mix[j];
+            }
+
+        }
+        return new Spectrum(background, resultSamples);
+    }
+
 }

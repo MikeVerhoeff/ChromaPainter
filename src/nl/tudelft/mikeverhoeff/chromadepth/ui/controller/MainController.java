@@ -8,14 +8,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
@@ -24,6 +19,8 @@ import nl.tudelft.mikeverhoeff.chromadepth.Paint;
 import nl.tudelft.mikeverhoeff.chromadepth.PaintMix;
 import nl.tudelft.mikeverhoeff.chromadepth.Painting;
 import nl.tudelft.mikeverhoeff.chromadepth.PaintingIO;
+import nl.tudelft.mikeverhoeff.chromadepth.colorspace.AdditiveColorSpace;
+import nl.tudelft.mikeverhoeff.chromadepth.colorspace.ColorSpace;
 import nl.tudelft.mikeverhoeff.chromadepth.colorspace.ImageCompare;
 import nl.tudelft.mikeverhoeff.chromadepth.colorspace.MyPrinterSimulator;
 import nl.tudelft.mikeverhoeff.chromadepth.painttools.PaintTool;
@@ -142,11 +139,35 @@ public class MainController implements Initializable {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Importing Image");
         File file = fileChooser.showOpenDialog(menuBar.getScene().getWindow());
-        Painting importedPainting = PaintingIO.loadImage(file);
-        if(importedPainting != null) {
-            displayPainting(importedPainting);
-            updateColorChange();
-        }
+
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.initOwner(menuBar.getScene().getWindow());
+
+
+        Button importButton = new Button("Import");
+        CheckBox asScreenCheckbox = new CheckBox("Import as Screen (not as print)");
+        Parent dialogUI = new VBox(asScreenCheckbox, importButton);
+
+        importButton.setOnAction(e->{
+            ColorSpace colorSpace = null;
+            if(asScreenCheckbox.isSelected()) {
+                List<Paint> lights = new ArrayList<>(3);
+                for (int i=0; i<3; i++) {
+                    lights.add(Paint.getDefault());
+                }
+                colorSpace = new AdditiveColorSpace(lights);
+            }
+            Painting importedPainting = PaintingIO.loadImage(file, colorSpace);
+            if(importedPainting != null) {
+                displayPainting(importedPainting);
+                updateColorChange();
+            }
+        });
+
+        Scene dialogScene = new Scene(dialogUI, 300, 200);
+        dialog.setScene(dialogScene);
+        dialog.show();
     }
 
     @FXML

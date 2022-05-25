@@ -4,6 +4,8 @@ import javafx.stage.Window;
 import nl.tudelft.mikeverhoeff.chromadepth.Paint;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.util.function.Consumer;
 
 public abstract class ColorSpace {
@@ -17,4 +19,7 @@ public abstract class ColorSpace {
 
     public abstract void configureGUI(Window window, Consumer<ColorSpace> afterFinish);
 
+    public void saveToWriter(DataOutputStream writer) {};
+
+    public void loadFromReader(DataInputStream reader) {};
 }

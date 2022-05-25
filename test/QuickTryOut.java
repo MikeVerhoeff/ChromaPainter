@@ -33,5 +33,12 @@ public class QuickTryOut {
         ColorMatchingFunctions.getColorForWavelength(700);
     }
 
+    @Test
+    public void gammaCorrectTest() {
+        float original = 0.5f;
+        float corrected = ColorMatchingFunctions.gammaCorrect(original);
+        float inverted = ColorMatchingFunctions.inverseGammaCorrect(corrected);
+        System.out.println(original + " -> " + corrected + " -> " + inverted);
+    }
 
 }

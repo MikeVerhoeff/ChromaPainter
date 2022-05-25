@@ -1,6 +1,9 @@
 package nl.tudelft.mikeverhoeff.chromadepth;
 
 import javafx.scene.control.Alert;
+import nl.tudelft.mikeverhoeff.chromadepth.colorspace.ColorSpace;
+import nl.tudelft.mikeverhoeff.chromadepth.colorspace.KubelkaMunkDyeColorSpace;
+import nl.tudelft.mikeverhoeff.chromadepth.colorspace.LinearMixSpace;
 import nl.tudelft.mikeverhoeff.chromadepth.colorspace.MyPrinterSimulator;
 
 import javax.imageio.ImageIO;
@@ -37,6 +40,12 @@ public class PaintingIO {
             metaWriter.writeInt(painting.getWidth());
             metaWriter.writeInt(painting.getHeight());
             metaWriter.writeInt(painting.getChannels().size());
+
+            String colorSpaceName = painting.getColorSpace().getClass().getSimpleName();
+            metaWriter.writeInt(colorSpaceName.length());
+            metaWriter.writeChars(colorSpaceName);
+            painting.getColorSpace().saveToWriter(metaWriter);
+
             metaWriter.close();
 
             for(int i=0; i<painting.getChannels().size(); i++) {
@@ -70,15 +79,33 @@ public class PaintingIO {
             int width = reader.readInt();
             int height = reader.readInt();
             int numChannels = reader.readInt();
+            int colorSpaceNameLength = reader.readInt();
+            StringBuilder colorSpaceNameBuilder = new StringBuilder();
+            for(int i=0; i<colorSpaceNameLength; i++) {
+                colorSpaceNameBuilder.append(reader.readChar());
+            }
+            String colorSpaceName = colorSpaceNameBuilder.toString();
+
+            ColorSpace colorSpace;
+            try {
+                Class<?> colorSpaceClass = Class.forName("nl.tudelft.mikeverhoeff.chromadepth.colorspace."+colorSpaceName);
+                colorSpace = (ColorSpace) colorSpaceClass.newInstance();
+                colorSpace.loadFromReader(reader);
+            } catch (Exception e) {
+                e.printStackTrace();
+                List<Paint> paints = new ArrayList<>(numChannels);
+                for(int i=0; i<numChannels; i++) {
+                    paints.add(Paint.getDefault());
+                }
+                colorSpace = new LinearMixSpace(paints);
+            }
+            reader.close();
 
             File parent = file.getParentFile();
 
-            List<Paint> paints = new ArrayList<>(numChannels);
-            for(int i=0; i<numChannels; i++) {
-                paints.add(Paint.getDefault());
-            }
 
-            Painting painting = new Painting(width, height, paints);
+
+            Painting painting = new Painting(width, height, colorSpace);
 
             for(int i=0; i<numChannels; i++) {
                 File channelFile = new File(parent, "Chanel_"+i+".bmp");
@@ -109,7 +136,7 @@ public class PaintingIO {
         }
     }
 
-    public static Painting loadImage(File file) {
+    public static Painting loadImage(File file, ColorSpace colorSpace) {
 
         try {
             BufferedImage image = ImageIO.read(file);
@@ -126,7 +153,10 @@ public class PaintingIO {
                     paints.add(Paint.getDefault());
                 }
             }
-            Painting painting = new Painting(width, height, new MyPrinterSimulator());
+            if(colorSpace == null) {
+                colorSpace = new MyPrinterSimulator();
+            }
+            Painting painting = new Painting(width, height, colorSpace);
 
             for(int x=0; x<width; x++) {
                 for(int y=0; y<height; y++) {
