@@ -86,7 +86,8 @@ public class PaintSlider extends AnchorPane {
 
     private void handleChange(int value) {
         this.value = (byte)value;
-        changeHandler.accept(this.value);
+        if(changeHandler != null)
+            changeHandler.accept(this.value);
     }
 
     public byte getValue() {

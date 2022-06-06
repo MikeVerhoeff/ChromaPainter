@@ -30,6 +30,7 @@ public class MyPrinterSimulator extends ColorSpace {
             printerSpace.setYellow(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\01_m1.txt")).get(0));
             printerSpace.setMagenta(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\05_m1.txt")).get(0));
             printerSpace.setKey(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\46_m1.txt")).get(0));
+            printerSpace.setN(5.22f);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -69,7 +70,7 @@ public class MyPrinterSimulator extends ColorSpace {
         int m = 255 - g - k;
         int y = 255 - b - k;
 
-        if (colorConverterCMYK != null) {
+        if (colorConverterCMYK != null && false) {
             float[] cymk = colorConverterCMYK.fromRGB(new float[] {r/255.0f, g/255.0f, b/255.0f});
             c = ((int)(cymk[0]*255))&0xff;
             m = ((int)(cymk[1]*255))&0xff;
@@ -91,5 +92,10 @@ public class MyPrinterSimulator extends ColorSpace {
     @Override
     public void configureGUI(Window window, Consumer<ColorSpace> finish) {
         finish.accept(this);
+    }
+
+    @Override
+    public void setBackground(Spectrum s) {
+        printerSpace.setBackgroundColor(s);
     }
 }

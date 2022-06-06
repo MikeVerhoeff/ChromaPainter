@@ -33,6 +33,7 @@ public class MixHelper {
 
             for(int d = 0; d<dyes.length; d++) {
                 float r_dye = dyes[d].getSamples()[i]*scale;
+                if(r_dye==0) {r_dye=0.0000001f;}
                 float ks_dye = ks(r_dye) - ks_background;
                 ks_mix += interp[d]*ks_dye;
             }
@@ -145,34 +146,47 @@ public class MixHelper {
         return nbp;
     }
 
-    public static float[] createNeugebauerMix(byte[] baseMix) {
-        int nbpCount = (int) Math.pow(2, baseMix.length);
-        float[] nbpMix = new float[nbpCount];
 
+    public static float[] createNeugebauerMix(byte[] baseMix) {
         float[] interp = new float[baseMix.length];
         for(int i=0; i<baseMix.length; i++) {
             interp[i] = Byte.toUnsignedInt(baseMix[i]) / 255.0f;
         }
 
+        return createNeugebauerMix(interp);
+    }
+    public static float[] createNeugebauerMix(float[] baseMix) {
+        int nbpCount = (int) Math.pow(2, baseMix.length);
+        float[] nbpMix = new float[nbpCount];
+
+        /*float[] interp = new float[baseMix.length];
+        for(int i=0; i<baseMix.length; i++) {
+            interp[i] = Byte.toUnsignedInt(baseMix[i]) / 255.0f;
+        }*/
+
         for(int i=0; i<nbpCount; i++) {
 
             nbpMix[i] = 1;
             for (int j = 0; j < baseMix.length; j++) {
-                nbpMix[i] *= ((i&(1<<j)) != 0) ? interp[j] : (1-interp[j]);
+                nbpMix[i] *= ((i&(1<<j)) != 0) ? baseMix[j] : (1-baseMix[j]);
             }
         }
         return nbpMix;
     }
 
     public static Spectrum mixNeugebauerPrimaries(Spectrum background, Spectrum[] primaries, float[] mix) {
+        return mixNeugebauerPrimaries(background, primaries, mix, 1);
+    }
+
+    public static Spectrum mixNeugebauerPrimaries(Spectrum background, Spectrum[] primaries, float[] mix, float n) {
         float[] resultSamples = new float[background.getSamples().length];
         for (int i=0; i<resultSamples.length; i++) {
 
             resultSamples[i] = 0;
             for(int j=0; j< primaries.length; j++) {
-                resultSamples[i] += primaries[j].getSamples()[i] * mix[j];
+                resultSamples[i] += Math.pow(primaries[j].getSamples()[i], 1.0/n) * mix[j];
             }
-
+            resultSamples[i] = (float)Math.pow(resultSamples[i], n);
         }
         return new Spectrum(background, resultSamples);
     }

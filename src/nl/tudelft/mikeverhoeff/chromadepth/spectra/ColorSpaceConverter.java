@@ -96,4 +96,49 @@ public class ColorSpaceConverter {
         return (float)Math.sqrt( Math.pow(Lab1[0]-Lab2[0], 2) + Math.pow(Lab1[1]-Lab2[1], 2) + Math.pow(Lab1[2]-Lab2[2], 2) );
     }
 
+    public static float[] xyYtoXYZ(float[] xyY) {
+        float x = xyY[0];
+        float y = xyY[1];
+        float Y = xyY[2];
+        return new float[]{x*y/y, Y, (1-x-y)*Y/y};
+    }
+
+    public static float[] XYZtoxyY(float[] XYZ) {
+        float X = XYZ[0];
+        float Y = XYZ[1];
+        float Z = XYZ[2];
+        return new float[]{X/(X+Y+Z), Y/(X+Y+Z), Y};
+    }
+
+    public static int XYZtoRGB(float[] XYZ) {
+        float X = XYZ[0];
+        float Y = XYZ[1];
+        float Z = XYZ[2];
+
+        // D65 conversion
+        float r = +3.2406f*X -1.5372f*Y -0.4986f*Z;
+        float g = -0.9689f*X +1.8758f*Y +0.0415f*Z;
+        float b = +0.0557f*X -0.2040f*Y +1.0570f*Z;
+        r = ColorMatchingFunctions.gammaCorrect(r)*255;
+        g = ColorMatchingFunctions.gammaCorrect(g)*255;
+        b = ColorMatchingFunctions.gammaCorrect(b)*255;
+
+        // calmp the values
+        if(r>255) {r=255;}
+        if(r<0) {r=0;}
+        if(g>255) {g=255;}
+        if(g<0) {g=0;}
+        if(b>255) {b=255;}
+        if(b<0) {b=0;}
+
+        //System.out.println("RGB: ("+(int)r+", "+(int)g+", "+(int)b+")");
+
+        return 0xff<<24 | (((int)r)&0xff)<<16 | (((int)g)&0xff)<<8 | ((int)b)&0xff;
+
+    }
+
+    public static float[] WavelengthToXYZ(int l) {
+        return new float[] {ColorMatchingFunctions.X(l), ColorMatchingFunctions.Y(l), ColorMatchingFunctions.Z(l)};
+    }
+
 }

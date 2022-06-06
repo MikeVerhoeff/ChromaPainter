@@ -52,12 +52,17 @@ public class Paint {
         return spectrum;
     }
 
+    public void setSpectrum(Spectrum s) {
+        spectrum = s;
+    }
+
     public int getScreenColor() {
         return spectrum.getArgb();
     }
 
     public static Paint getDefault() {
-        return new Paint(RGBColor.WHITE);
+        Spectrum spectrum = new Spectrum(380, 730, 10, new float[(730-380)/10+1], "D50");
+        return new Paint(spectrum);
     }
 
     public void displayEditDialog(MainController mainController) {

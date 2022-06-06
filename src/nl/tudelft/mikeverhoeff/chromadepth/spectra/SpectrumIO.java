@@ -151,7 +151,7 @@ public class SpectrumIO {
         for(float s:spectrum.getSamples()) {
             writer.writeFloat(s);
         }
-        if(spectrum.getIlluminant() !=null && spectrum.getIlluminant().equals("D50")) {
+        if(spectrum.getIlluminant() !=null) {
             writer.writeInt(5);
         } else {
             writer.writeInt(0);
@@ -167,9 +167,9 @@ public class SpectrumIO {
         for(int i=0; i<samples.length; i++) {
             samples[i] = reader.readFloat();
         }
-        String illuminant=null;
-        if(reader.readInt()==5) {
-            illuminant = "D50";
+        String illuminant="D50";
+        if(reader.readInt()==0) {
+            illuminant = null;
         }
 
         return new Spectrum(start, stop, step, samples, illuminant);

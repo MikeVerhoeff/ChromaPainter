@@ -29,6 +29,12 @@ public class ColorMixer extends AnchorPane {
         AnchorPane.setLeftAnchor(mixColor, 10.0);
         AnchorPane.setRightAnchor(mixColor, 10.0);
         mixColor.setPrefHeight(50);
+        mixColor.setOnMouseClicked(e->{
+            if(this.colorSpace != null) {
+                SelectSpectrumController.display(this.getScene().getWindow(), s -> colorSpace.setBackground(s));
+                mainController.updateColorChange();
+            }
+        });
 
         paintSlides = new VBox();
         this.getChildren().add(paintSlides);
@@ -49,6 +55,7 @@ public class ColorMixer extends AnchorPane {
 
     public void setColorSpace(ColorSpace colorSpace) {
         this.colorSpace = colorSpace;
+        AnchorPane.setTopAnchor(spectrogramChart, 100.0+30*colorSpace.getNumberOfChannels());
     }
 
     public void setPaintMix(byte[] values) {
@@ -80,6 +87,7 @@ public class ColorMixer extends AnchorPane {
     }
 
     public void updateColorChange() {
+        colorSpace.forceColorUpdate();
         updateMixColor();
         for(Node node:paintSlides.getChildren()) {
             if(node instanceof PaintSlider) {

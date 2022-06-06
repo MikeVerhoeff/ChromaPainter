@@ -148,11 +148,11 @@ public class Spectrum {
             }
         }
 
-        if(refXYZ != null && refXYZ.length>=3) {
+        /*if(refXYZ != null && refXYZ.length>=3) {
             System.out.println("XYZ (cal): "+X+", "+Y+", "+Z);
             System.out.println("XYZ (ref): " + refXYZ[0] + ", " + refXYZ[1] + ", " + refXYZ[2]);
             System.out.println("XYZ (delta): " + (X - refXYZ[0]) + ", " + (Y - refXYZ[1]) + ", " + (Z - refXYZ[2]));
-        }
+        }*/
 
         // D65 conversion
         float r = +3.2406f*X -1.5372f*Y -0.4986f*Z;

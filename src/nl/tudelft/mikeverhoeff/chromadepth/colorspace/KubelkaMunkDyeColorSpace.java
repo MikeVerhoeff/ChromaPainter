@@ -14,9 +14,14 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import nl.tudelft.mikeverhoeff.chromadepth.Paint;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
+import nl.tudelft.mikeverhoeff.chromadepth.spectra.SpectrumIO;
 import nl.tudelft.mikeverhoeff.chromadepth.ui.controller.NewCanvasDialogController;
 import nl.tudelft.mikeverhoeff.chromadepth.ui.controller.PaintSlider;
+import nl.tudelft.mikeverhoeff.chromadepth.util.MainControllerWindowWrapper;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -87,6 +92,7 @@ public class KubelkaMunkDyeColorSpace extends ColorSpace {
 
         Label backgroundText = new Label("Background Color:");
         PaintSlider backgroundPaint = new PaintSlider(background, (byte)0);
+        backgroundPaint.setMainController(new MainControllerWindowWrapper(window, backgroundPaint::updateColorChange));
         HBox backgroundRow = new HBox(backgroundText, backgroundPaint);
 
         Button acceptButton = new Button("Okay");
@@ -103,5 +109,39 @@ public class KubelkaMunkDyeColorSpace extends ColorSpace {
         Scene dialogScene = new Scene(dialogUI, 300, 200);
         dialog.setScene(dialogScene);
         dialog.show();
+    }
+
+    @Override
+    public void setBackground(Spectrum s) {
+        background.setSpectrum(s);
+    }
+
+
+    @Override
+    public void saveToWriter(DataOutputStream writer) {
+        try {
+            SpectrumIO.saveToWriter(background.getSpectrum(), writer);
+            writer.writeInt(dyes.size());
+            for(Paint dye : dyes) {
+                SpectrumIO.saveToWriter(dye.getSpectrum(), writer);
+            }
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    @Override
+    public void loadFromReader(DataInputStream reader) {
+        try {
+            background = new Paint(SpectrumIO.loadFromReader(reader));
+            int count = reader.readInt();
+            dyes = new ArrayList<Paint>(count);
+            for(int i=0; i<count; i++) {
+                Paint dye = new Paint(SpectrumIO.loadFromReader(reader));
+                dyes.add(dye);
+            }
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
     }
 }

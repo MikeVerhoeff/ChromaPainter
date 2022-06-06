@@ -22,4 +22,8 @@ public abstract class ColorSpace {
     public void saveToWriter(DataOutputStream writer) {};
 
     public void loadFromReader(DataInputStream reader) {};
+
+    public void setBackground(Spectrum s) {}
+
+    public void forceColorUpdate() {}
 }

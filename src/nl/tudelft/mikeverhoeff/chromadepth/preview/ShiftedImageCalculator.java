@@ -95,7 +95,7 @@ public class ShiftedImageCalculator {
 
         //System.out.println("Min shift: "+minShift+", Max shift: "+maxShift);
         // shift the spectra
-        System.out.println("calculating shifted image");
+        //System.out.println("calculating shifted image");
         for(int s=0; s<samplecount; s++) {
             double calculatedShift = calculateShift(start+s*step, distance, eye)/pixelsize;
             //System.out.println("sample layer "+s+" : "+calculatedShift);
