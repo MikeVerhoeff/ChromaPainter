@@ -12,7 +12,11 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
+import java.nio.file.Paths;
+
 public class Main extends Application {
+
+    public static String SpectrumDirectory = "C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra";
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -27,8 +31,8 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        Mat mat = Mat.eye(3,3, CvType.CV_8UC1);
-        System.out.println("mat = " + mat.dump());
+        SpectrumDirectory = Paths.get("").toAbsolutePath().toString()+"\\src\\res\\Spectra";
+        System.out.println(SpectrumDirectory);
         launch(args);
     }
 }

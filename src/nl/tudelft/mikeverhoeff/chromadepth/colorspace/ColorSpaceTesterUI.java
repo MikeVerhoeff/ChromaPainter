@@ -9,6 +9,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import nl.tudelft.mikeverhoeff.chromadepth.Main;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.ColorSpaceConverter;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.SpectrogramChart;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
@@ -112,11 +113,11 @@ public class ColorSpaceTesterUI implements Initializable {
         printerSpace = new MyPrinterSimulator();
         colorSpace = printerSpace.getPrinterSpace();
         try {
-            colorSpace.setBackgroundColor(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\50_m1.txt")).get(0));
-            colorSpace.setCyan(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\06_m1.txt")).get(0));
-            colorSpace.setYellow(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\01_m1.txt")).get(0));
-            colorSpace.setMagenta(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\05_m1.txt")).get(0));
-            colorSpace.setKey(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\46_m1.txt")).get(0));
+            colorSpace.setBackgroundColor(SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\50_m1.txt")).get(0));
+            colorSpace.setCyan(SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\06_m1.txt")).get(0));
+            colorSpace.setYellow(SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\01_m1.txt")).get(0));
+            colorSpace.setMagenta(SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\05_m1.txt")).get(0));
+            colorSpace.setKey(SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\46_m1.txt")).get(0));
             //resultSpectrum.setMaxValue(colorSpace.getMaxIntensity());
             //referenceSpectrum.setMaxValue(colorSpace.getMaxIntensity());
             resultSpectrum.setMaxValue(1);

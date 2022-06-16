@@ -1,6 +1,7 @@
 package nl.tudelft.mikeverhoeff.chromadepth.colorspace;
 
 import javafx.stage.Window;
+import nl.tudelft.mikeverhoeff.chromadepth.Main;
 import nl.tudelft.mikeverhoeff.chromadepth.Paint;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.SpectrumIO;
@@ -25,11 +26,11 @@ public class MyPrinterSimulator extends ColorSpace {
             exception.printStackTrace();
         }
         try {
-            printerSpace.setBackgroundColor(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\50_m1.txt")).get(0));
-            printerSpace.setCyan(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\06_m1.txt")).get(0));
-            printerSpace.setYellow(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\01_m1.txt")).get(0));
-            printerSpace.setMagenta(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\05_m1.txt")).get(0));
-            printerSpace.setKey(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\46_m1.txt")).get(0));
+            printerSpace.setBackgroundColor(SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\50_m1.txt")).get(0));
+            printerSpace.setCyan(SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\06_m1.txt")).get(0));
+            printerSpace.setYellow(SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\01_m1.txt")).get(0));
+            printerSpace.setMagenta(SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\05_m1.txt")).get(0));
+            printerSpace.setKey(SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\46_m1.txt")).get(0));
             printerSpace.setN(5.22f);
         } catch (Exception e) {
             e.printStackTrace();

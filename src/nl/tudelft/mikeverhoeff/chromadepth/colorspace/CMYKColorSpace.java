@@ -1,6 +1,7 @@
 package nl.tudelft.mikeverhoeff.chromadepth.colorspace;
 
 import javafx.stage.Window;
+import nl.tudelft.mikeverhoeff.chromadepth.Main;
 import nl.tudelft.mikeverhoeff.chromadepth.Paint;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.SpectrumIO;
@@ -131,11 +132,11 @@ public class CMYKColorSpace extends ColorSpace {
     @Override
     public void configureGUI(Window window, Consumer<ColorSpace> finish) {
         try {
-            this.setBackgroundColor(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\50_m1.txt")).get(0));
-            this.setCyan(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\06_m1.txt")).get(0));
-            this.setYellow(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\01_m1.txt")).get(0));
-            this.setMagenta(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\05_m1.txt")).get(0));
-            this.setKey(SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\46_m1.txt")).get(0));
+            this.setBackgroundColor(SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\50_m1.txt")).get(0));
+            this.setCyan(SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\06_m1.txt")).get(0));
+            this.setYellow(SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\01_m1.txt")).get(0));
+            this.setMagenta(SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\05_m1.txt")).get(0));
+            this.setKey(SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\46_m1.txt")).get(0));
             finish.accept(this);
         } catch (Exception e) {
             e.printStackTrace();

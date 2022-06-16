@@ -19,6 +19,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import nl.tudelft.mikeverhoeff.chromadepth.Main;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.SpectrogramChart;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.SpectrumIO;
@@ -37,7 +38,7 @@ public class SelectSpectrumController implements Initializable {
     private static Map<File, Spectrum> loadedSpectrum;
     static {
         loadedSpectrum = new HashMap<>();
-        lastDirectory = new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra");
+        lastDirectory = new File(Main.SpectrumDirectory);
     }
     private static File lastDirectory;
 

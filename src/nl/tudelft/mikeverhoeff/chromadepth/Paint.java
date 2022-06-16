@@ -31,16 +31,16 @@ public class Paint {
         try {
             switch (color) {
                 case RED:
-                    spectrum = SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\03_M1.txt")).get(0);
+                    spectrum = SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\03_M1.txt")).get(0);
                     break;
                 case GREEN:
-                    spectrum = SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\08_M1.txt")).get(0);
+                    spectrum = SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\08_M1.txt")).get(0);
                     break;
                 case BLUE:
-                    spectrum = SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\13_M1.txt")).get(0);
+                    spectrum = SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\13_M1.txt")).get(0);
                     break;
                 case WHITE:
-                    spectrum = SpectrumIO.loadCGATS17Spectrum(new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\50_M1.txt")).get(0);
+                    spectrum = SpectrumIO.loadCGATS17Spectrum(new File(Main.SpectrumDirectory+"\\50_M1.txt")).get(0);
                     break;
             }
         } catch (IOException e) {

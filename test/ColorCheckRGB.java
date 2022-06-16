@@ -1,3 +1,4 @@
+import nl.tudelft.mikeverhoeff.chromadepth.Main;
 import nl.tudelft.mikeverhoeff.chromadepth.colorspace.MixHelper;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.ColorSpaceConverter;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 public class ColorCheckRGB {
 
-    private static final File spectrumFolder = new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\");
+    private static final File spectrumFolder = new File(Main.SpectrumDirectory+"\\");
 
     //private List<Pair<String, Spectrum>> colorSamples;
     private Map<String, Spectrum> colorSamples;

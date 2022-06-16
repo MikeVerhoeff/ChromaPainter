@@ -1,3 +1,4 @@
+import nl.tudelft.mikeverhoeff.chromadepth.Main;
 import nl.tudelft.mikeverhoeff.chromadepth.colorspace.MixHelper;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.ColorSpaceConverter;
 import nl.tudelft.mikeverhoeff.chromadepth.spectra.Spectrum;
@@ -9,7 +10,7 @@ import java.io.IOException;
 
 public class ColorCheckCMYK {
 
-    private static final File spectrumFolder = new File("C:\\Users\\Mike\\Pictures\\ChromaPaint\\Spectra\\CMYK\\");
+    private static final File spectrumFolder = new File(Main.SpectrumDirectory+"\\CMYK\\");
 
     public ColorCheckCMYK() throws IOException {
     }
