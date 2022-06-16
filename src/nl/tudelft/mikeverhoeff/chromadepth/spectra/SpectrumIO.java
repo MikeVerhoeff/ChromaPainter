@@ -99,6 +99,7 @@ public class SpectrumIO {
             spectra.add(spectrum);
         }
         //System.out.println(spectra);
+        //System.out.println(spectra.get(0).getSamples().length);
         return spectra;
     }
 

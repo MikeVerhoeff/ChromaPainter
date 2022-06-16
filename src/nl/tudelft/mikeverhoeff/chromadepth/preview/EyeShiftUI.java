@@ -124,7 +124,7 @@ public class EyeShiftUI extends VBox {
         // animation
         AnimationTimer animationTimer = new AnimationTimer() {
             int frame=0;
-            int spacing = 10;
+            int spacing = 4;
             @Override
             public void handle(long now) {
                 if(doAnimate) {

@@ -75,7 +75,7 @@ public class StereoDepthMap {
         HighGui.imshow("disp", colormaped);
         HighGui.waitKey(1);
 
-        return matToImage(disparity);
+        return matToImage(colormaped);
     }
 
 }
